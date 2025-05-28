@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: Pack Nugets
 
 on:
@@ -28,4 +25,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c $CONFIGURATION
     - name: Pack
-      run: dotnet pack --no-build --no-restore -c $CONFIGURATION
+      run: dotnet pack --no-build --no-restore -c $CONFIGURATION -o .
+    - name: Archive nugets
+      uses: actions/upload-artifact@v4
+      with:
+        name: nugets
+        path: ./**.nupkg
+        if-no-files-found: error
