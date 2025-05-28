@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <Description>DapperWire implementations for Microsoft extension packages</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md;..\..\LICENSE;..\..\logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DapperWire\DapperWire.csproj" />
+  </ItemGroup>
+
+</Project>
