@@ -1,12 +1,16 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: Pack Nugets
 
 on:
   push:
-    branches: [ "refs/tags/v*" ]
+    branches:
+      - refs/tags/v*
   workflow_dispatch:
+
+env:
+  CONFIGURATION: release
 
 jobs:
   build:
@@ -22,4 +26,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c $CONFIGURATION
+    - name: Pack
+      run: dotnet pack --no-build --no-restore -c $CONFIGURATION
