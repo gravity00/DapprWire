@@ -18,6 +18,9 @@ public class Database(
 
     #region Disposables
 
+    /// <summary>
+    /// Finalizes the database connection.
+    /// </summary>
     ~Database() => Dispose(false);
 
     /// <inheritdoc />
