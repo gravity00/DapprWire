@@ -92,8 +92,7 @@ public class Database(
         if (_connection == null)
         {
             isNew = true;
-
-            _connection = dbConnectionFactory();
+            _connection = await dbConnectionFactory();
         }
         else
             isNew = false;
@@ -102,10 +101,7 @@ public class Database(
         if (_connection.State is not ConnectionState.Open)
         {
             wasOpen = false;
-
             await _connection.OpenAsync(ct).ConfigureAwait(false);
-            if (options.OnConnectionOpened is not null)
-                await options.OnConnectionOpened(_connection, ct).ConfigureAwait(false);
         }
         else
             wasOpen = true;
