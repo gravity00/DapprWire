@@ -37,20 +37,35 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Adds the database services to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="config">An optional callback to configure database options.</param>
+    /// <returns>The service collection after changes.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IServiceCollection AddDatabase(
+        this IServiceCollection services,
+        Func<IServiceProvider, DbConnection> connectionFactory,
+        Action<DatabaseOptions>? config = null
+    ) => services.AddDatabase(
+        s => Task.FromResult(connectionFactory(s)),
+        config
+    );
+
+    /// <summary>
     /// Adds the strongly-typed database services to the service collection.
     /// </summary>
     /// <typeparam name="TName"></typeparam>
     /// <param name="services">The service collection.</param>
     /// <param name="connectionFactory">The connection factory.</param>
     /// <param name="config">An optional callback to configure database options.</param>
-    /// <param name="registerAsDefault">Should this database be considered the default database?</param>
     /// <returns>The service collection after changes.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static IServiceCollection AddDatabase<TName>(
         this IServiceCollection services,
         Func<IServiceProvider, Task<DbConnection>> connectionFactory,
-        Action<DatabaseOptions>? config = null,
-        bool registerAsDefault = false
+        Action<DatabaseOptions>? config = null
     ) where TName : IDatabaseName
     {
         if (services == null) throw new ArgumentNullException(nameof(services));
@@ -63,12 +78,67 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDatabaseFactory<TName>, MicrosoftExtensionsDatabaseFactory<TName>>();
         services.AddScoped<IDatabase<TName>, MicrosoftExtensionsDatabase<TName>>();
 
-        if (registerAsDefault)
-        {
-            services.AddSingleton<IDatabaseFactory>(s => s.GetRequiredService<IDatabaseFactory<TName>>());
-            services.AddScoped<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
-        }
+        return services;
+    }
+
+    /// <summary>
+    /// Adds the strongly-typed database services to the service collection.
+    /// </summary>
+    /// <typeparam name="TName"></typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="config">An optional callback to configure database options.</param>
+    /// <returns>The service collection after changes.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IServiceCollection AddDatabase<TName>(
+        this IServiceCollection services,
+        Func<IServiceProvider, DbConnection> connectionFactory,
+        Action<DatabaseOptions>? config = null
+    ) where TName : IDatabaseName => services.AddDatabase<TName>(
+        s => Task.FromResult(connectionFactory(s)),
+        config
+    );
+
+    /// <summary>
+    /// Adds the strongly-typed database services to the service collection while also
+    /// being considered the default database for resolution purposes.
+    /// </summary>
+    /// <typeparam name="TName"></typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="config">An optional callback to configure database options.</param>
+    /// <returns>The service collection after changes.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IServiceCollection AddDatabaseAsDefault<TName>(
+        this IServiceCollection services,
+        Func<IServiceProvider, Task<DbConnection>> connectionFactory,
+        Action<DatabaseOptions>? config = null
+    ) where TName : IDatabaseName
+    {
+        services.AddDatabase<TName>(connectionFactory, config);
+
+        services.AddSingleton<IDatabaseFactory>(s => s.GetRequiredService<IDatabaseFactory<TName>>());
+        services.AddScoped<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the strongly-typed database services to the service collection while also
+    /// being considered the default database for resolution purposes.
+    /// </summary>
+    /// <typeparam name="TName"></typeparam>
+    /// <param name="services">The service collection.</param>
+    /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="config">An optional callback to configure database options.</param>
+    /// <returns>The service collection after changes.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IServiceCollection AddDatabaseAsDefault<TName>(
+        this IServiceCollection services,
+        Func<IServiceProvider, DbConnection> connectionFactory,
+        Action<DatabaseOptions>? config = null
+    ) where TName : IDatabaseName => services.AddDatabaseAsDefault<TName>(
+        s => Task.FromResult(connectionFactory(s)),
+        config
+    );
 }
