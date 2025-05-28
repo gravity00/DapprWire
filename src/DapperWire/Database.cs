@@ -6,8 +6,10 @@ namespace DapperWire;
 /// <summary>
 /// Represents a database connection.
 /// </summary>
+/// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class Database(
+    DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabase
 {
@@ -74,14 +76,41 @@ public class Database(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
-    public virtual async Task ConnectAsync(CancellationToken ct)
+    public virtual async Task ConnectAsync(CancellationToken ct) => await GetDbConnectionAsync(ct).ConfigureAwait(false);
+
+    /// <summary>
+    /// Ensures the database connection is initialized and opens it if necessary.
+    /// </summary>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result.</returns>
+    /// <exception cref="ObjectDisposedException"></exception>
+    protected virtual async Task<GetDbConnectionResult> GetDbConnectionAsync(CancellationToken ct)
     {
         EnsureNotDisposed();
 
-        _connection ??= dbConnectionFactory();
+        bool isNew;
+        if (_connection == null)
+        {
+            isNew = true;
 
+            _connection = dbConnectionFactory();
+        }
+        else
+            isNew = false;
+
+        bool wasOpen;
         if (_connection.State is not ConnectionState.Open)
+        {
+            wasOpen = false;
+
             await _connection.OpenAsync(ct).ConfigureAwait(false);
+            if (options.OnConnectionOpened is not null)
+                await options.OnConnectionOpened(_connection, ct).ConfigureAwait(false);
+        }
+        else
+            wasOpen = true;
+
+        return new GetDbConnectionResult(_connection, isNew, wasOpen);
     }
 
     /// <summary>
@@ -99,8 +128,10 @@ public class Database(
 /// Represents a strongly-typed database connection.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
+/// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class Database<TName>(
+    DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : Database(() => dbConnectionFactory()), IDatabase<TName>
+) : Database(options , () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;

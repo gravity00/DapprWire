@@ -5,15 +5,17 @@ namespace DapperWire;
 /// <summary>
 /// Represents a factory for creating database connections.
 /// </summary>
+/// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class DatabaseFactory(
+    DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabaseFactory
 {
     /// <inheritdoc />
     public virtual async Task<IDatabase> CreateAsync(CancellationToken ct)
     {
-        var database = new Database(dbConnectionFactory);
+        var database = CreateDatabase();
 
         try
         {
@@ -31,14 +33,22 @@ public class DatabaseFactory(
 
         return database;
     }
+
+    /// <summary>
+    /// Creates a new database instance.
+    /// </summary>
+    /// <returns>The database instance.</returns>
+    protected virtual Database CreateDatabase() => new(options, dbConnectionFactory);
 }
 
 /// <summary>
 /// Represents a strongly-typed factory for creating database connections.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
+/// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class DatabaseFactory<TName>(
+    DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : DatabaseFactory(() => dbConnectionFactory()), IDatabaseFactory<TName>
+) : DatabaseFactory(options , () => dbConnectionFactory()), IDatabaseFactory<TName>
     where TName : IDatabaseName;
