@@ -16,9 +16,6 @@ public interface IDatabaseFactory
 /// <summary>
 /// Represents a strongly-typed factory for creating database connections.
 /// </summary>
-/// <typeparam name="TName"></typeparam>
+/// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabaseFactory<TName> : IDatabaseFactory
-    where TName : IDatabaseName
-{
-
-}
+    where TName : IDatabaseName;

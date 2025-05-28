@@ -4,7 +4,7 @@
 /// Represents a database connection.
 /// </summary>
 public interface IDatabase : IDisposable
-#if NETSTANDARD2_1_OR_GREATER || NET8_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
     , IAsyncDisposable
 #endif
 {
@@ -14,6 +14,7 @@ public interface IDatabase : IDisposable
 /// <summary>
 /// Represents a strongly-typed database connection.
 /// </summary>
+/// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabase<TName> : IDatabase
     where TName : IDatabaseName;
 
