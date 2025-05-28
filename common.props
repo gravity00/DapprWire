@@ -1,0 +1,42 @@
+<Project>
+
+  <PropertyGroup>
+    <RootNamespace>DapperWire</RootNamespace>
+    <Product>DapperWire</Product>
+    <Company>Simplesoft</Company>
+    <Copyright>Copyright © 2025 João Simões</Copyright>
+    <Authors>João Simões</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net4.6.1;net8.0</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GenerateAssemblyTitleAttribute>true</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>true</GenerateAssemblyDescriptionAttribute>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageTags>database;orm;</PackageTags>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/gravity00/DapperWire</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/gravity00/DapperWire.git</RepositoryUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.25000</FileVersion>
+    <VersionPrefix>1.0.0-dev001</VersionPrefix>
+  </PropertyGroup>
+
+</Project>
