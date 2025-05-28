@@ -1,4 +1,6 @@
-﻿namespace DapperWire;
+﻿using System.Data;
+
+namespace DapperWire;
 
 /// <summary>
 /// Represents a database connection.
@@ -8,7 +10,16 @@ public interface IDatabase : IDisposable
     , IAsyncDisposable
 #endif
 {
-
+    /// <summary>
+    /// Starts a new database transaction.
+    /// </summary>
+    /// <param name="isolationLevel">The transaction isolation level.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result.</returns>
+    Task<IDatabaseTransaction> BeginTransactionAsync(
+        IsolationLevel isolationLevel,
+        CancellationToken ct
+    );
 }
 
 /// <summary>
@@ -17,4 +28,3 @@ public interface IDatabase : IDisposable
 /// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabase<TName> : IDatabase
     where TName : IDatabaseName;
-

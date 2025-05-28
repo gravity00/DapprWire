@@ -15,6 +15,7 @@ public class Database(
 {
     private bool _disposed;
     private DbConnection? _connection;
+    private DbTransaction? _transaction;
 
     #region Disposables
 
@@ -37,8 +38,12 @@ public class Database(
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)
+        {
+            _transaction?.Dispose();
             _connection?.Dispose();
+        }
 
+        _transaction = null;
         _connection = null;
         _disposed = true;
     }
@@ -59,9 +64,13 @@ public class Database(
     /// <returns>A task to be awaited for the result.</returns>
     protected virtual async ValueTask DisposeAsyncCore()
     {
+        if(_transaction is not null)
+            await _transaction.DisposeAsync().ConfigureAwait(false);
+
         if (_connection is not null)
             await _connection.DisposeAsync().ConfigureAwait(false);
 
+        _transaction = null;
         _connection = null;
         _disposed = true;
     }
@@ -69,6 +78,37 @@ public class Database(
 #endif
 
     #endregion
+
+
+    /// <inheritdoc />
+    public virtual async Task<IDatabaseTransaction> BeginTransactionAsync(
+        IsolationLevel isolationLevel, 
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        if (_transaction is not null)
+            throw new InvalidOperationException("A transaction is already in progress.");
+
+        var result = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+
+        if(isolationLevel == default)
+            isolationLevel = options.DefaultIsolationLevel;
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        var transaction = await result.Connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
+#else
+        var transaction = result.Connection.BeginTransaction(isolationLevel);
+#endif
+
+        _transaction = transaction;
+
+        return new DatabaseTransaction(transaction, () =>
+        {
+            _transaction = null;
+        });
+    }
 
     /// <summary>
     /// Connects to the database asynchronously.
