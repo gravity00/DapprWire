@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
 /// Provides extension methods for <see cref="IDatabase"/> instances.

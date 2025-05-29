@@ -64,7 +64,7 @@ public class Database(
     /// <returns>A task to be awaited for the result.</returns>
     protected virtual async ValueTask DisposeAsyncCore()
     {
-        if(_transaction is not null)
+        if (_transaction is not null)
             await _transaction.DisposeAsync().ConfigureAwait(false);
 
         if (_connection is not null)
@@ -79,10 +79,9 @@ public class Database(
 
     #endregion
 
-
     /// <inheritdoc />
     public virtual async Task<IDatabaseTransaction> BeginTransactionAsync(
-        IsolationLevel isolationLevel, 
+        IsolationLevel isolationLevel,
         CancellationToken ct
     )
     {
@@ -93,7 +92,7 @@ public class Database(
 
         var result = await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
-        if(isolationLevel == default)
+        if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
@@ -172,5 +171,5 @@ public class Database(
 public class Database<TName>(
     DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : Database(options , () => dbConnectionFactory()), IDatabase<TName>
+) : Database(options, () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;
