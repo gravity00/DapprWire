@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static IServiceCollection AddDatabase(
         this IServiceCollection services,
-        Func<IServiceProvider, Task<DbConnection>> connectionFactory,
+        Func<IServiceProvider, DbConnection> connectionFactory,
         Action<DatabaseOptions>? config = null
     )
     {
@@ -37,23 +37,6 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the database services to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="connectionFactory">The connection factory.</param>
-    /// <param name="config">An optional callback to configure database options.</param>
-    /// <returns>The service collection after changes.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static IServiceCollection AddDatabase(
-        this IServiceCollection services,
-        Func<IServiceProvider, DbConnection> connectionFactory,
-        Action<DatabaseOptions>? config = null
-    ) => services.AddDatabase(
-        s => Task.FromResult(connectionFactory(s)),
-        config
-    );
-
-    /// <summary>
     /// Adds the strongly-typed database services to the service collection.
     /// </summary>
     /// <typeparam name="TName"></typeparam>
@@ -64,7 +47,7 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static IServiceCollection AddDatabase<TName>(
         this IServiceCollection services,
-        Func<IServiceProvider, Task<DbConnection>> connectionFactory,
+        Func<IServiceProvider, DbConnection> connectionFactory,
         Action<DatabaseOptions>? config = null
     ) where TName : IDatabaseName
     {
@@ -82,24 +65,6 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds the strongly-typed database services to the service collection.
-    /// </summary>
-    /// <typeparam name="TName"></typeparam>
-    /// <param name="services">The service collection.</param>
-    /// <param name="connectionFactory">The connection factory.</param>
-    /// <param name="config">An optional callback to configure database options.</param>
-    /// <returns>The service collection after changes.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static IServiceCollection AddDatabase<TName>(
-        this IServiceCollection services,
-        Func<IServiceProvider, DbConnection> connectionFactory,
-        Action<DatabaseOptions>? config = null
-    ) where TName : IDatabaseName => services.AddDatabase<TName>(
-        s => Task.FromResult(connectionFactory(s)),
-        config
-    );
-
-    /// <summary>
     /// Adds the strongly-typed database services to the service collection while also
     /// being considered the default database for resolution purposes.
     /// </summary>
@@ -111,7 +76,7 @@ public static class ServiceCollectionExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static IServiceCollection AddDatabaseAsDefault<TName>(
         this IServiceCollection services,
-        Func<IServiceProvider, Task<DbConnection>> connectionFactory,
+        Func<IServiceProvider, DbConnection> connectionFactory,
         Action<DatabaseOptions>? config = null
     ) where TName : IDatabaseName
     {
@@ -122,23 +87,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    /// <summary>
-    /// Adds the strongly-typed database services to the service collection while also
-    /// being considered the default database for resolution purposes.
-    /// </summary>
-    /// <typeparam name="TName"></typeparam>
-    /// <param name="services">The service collection.</param>
-    /// <param name="connectionFactory">The connection factory.</param>
-    /// <param name="config">An optional callback to configure database options.</param>
-    /// <returns>The service collection after changes.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static IServiceCollection AddDatabaseAsDefault<TName>(
-        this IServiceCollection services,
-        Func<IServiceProvider, DbConnection> connectionFactory,
-        Action<DatabaseOptions>? config = null
-    ) where TName : IDatabaseName => services.AddDatabaseAsDefault<TName>(
-        s => Task.FromResult(connectionFactory(s)),
-        config
-    );
 }

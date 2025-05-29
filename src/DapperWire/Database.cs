@@ -134,7 +134,7 @@ public class Database(
         if (_connection == null)
         {
             isNew = true;
-            _connection = await dbConnectionFactory();
+            _connection = dbConnectionFactory();
         }
         else
             isNew = false;
@@ -144,6 +144,10 @@ public class Database(
         {
             wasOpen = false;
             await _connection.OpenAsync(ct).ConfigureAwait(false);
+
+            if (options.OnConnectionOpen is not null)
+                await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
+
         }
         else
             wasOpen = true;
