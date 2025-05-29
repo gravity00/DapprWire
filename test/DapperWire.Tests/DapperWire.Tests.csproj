@@ -13,9 +13,6 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="Xunit.Abstractions" />
-
-    <Using Include="DapperWire.Definitions" />
-    <Using Include="DapperWire.Fixtures" />
   </ItemGroup>
 
   <ItemGroup>
