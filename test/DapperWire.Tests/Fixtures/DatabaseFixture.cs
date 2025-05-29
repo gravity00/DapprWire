@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
@@ -13,12 +14,25 @@ public sealed class DatabaseFixture : IAsyncLifetime
         _container = new MsSqlBuilder().Build();
 
         await _container.StartAsync();
+
+        await using var connection = GetDbConnection();
+        await connection.OpenAsync();
+
+        await connection.ExecuteAsync(@"
+create table TestTable
+(
+    Id int identity(1,1) primary key,
+    ExternalId uniqueidentifier not null unique,
+    Name nvarchar(100) not null
+)");
     }
 
     public async Task DisposeAsync()
     {
         if (_container is not null)
             await _container.DisposeAsync();
+
+        _container = null;
     }
 
     public DbConnection GetDbConnection()
