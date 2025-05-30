@@ -1,29 +1,20 @@
-﻿using System.Data;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
-/// Represents a database connection.
+/// Represents a factory for creating database connections.
 /// </summary>
-public interface IDatabase : IDisposable
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-    , IAsyncDisposable
-#endif
+public interface IDatabase
 {
     /// <summary>
-    /// Starts a new database transaction.
+    /// Creates and connects to a database.
     /// </summary>
-    /// <param name="isolationLevel">The transaction isolation level.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
-    Task<IDatabaseTransaction> BeginTransactionAsync(
-        IsolationLevel isolationLevel,
-        CancellationToken ct
-    );
+    /// <returns>A task to be awaited for the result</returns>
+    Task<IDatabaseSession> ConnectAsync(CancellationToken ct);
 }
 
 /// <summary>
-/// Represents a strongly-typed database connection.
+/// Represents a strongly-typed factory for creating database connections.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabase<TName> : IDatabase

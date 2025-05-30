@@ -38,7 +38,7 @@ create table TestTable
     public DbConnection GetDbConnection()
     {
         if (_container is null)
-            throw new InvalidOperationException("Database container is not initialized.");
+            throw new InvalidOperationException("DatabaseSession container is not initialized.");
 
         var connectionString = _container.GetConnectionString();
         return new SqlConnection(connectionString);

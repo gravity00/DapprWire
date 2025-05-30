@@ -13,10 +13,10 @@ public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
             builder.Services.AddDatabase(_ => fixture.GetDbConnection());
         });
         
-        var databaseFactory = host.Services.GetService<IDatabaseFactory>();
+        var databaseFactory = host.Services.GetService<IDatabase>();
         
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabaseFactory>(databaseFactory);
+        Assert.IsType<MicrosoftExtensionsDatabase>(databaseFactory);
     }
 
     [Fact]
@@ -29,10 +29,10 @@ public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabase>();
+        var database = scope.ServiceProvider.GetService<IDatabaseSession>();
         
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabase>(database);
+        Assert.IsType<MicrosoftExtensionsDatabaseSession>(database);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         });
 
         Assert.Throws<InvalidOperationException>(
-            () => host.Services.GetService<IDatabase>()
+            () => host.Services.GetService<IDatabaseSession>()
         );
     }
 }

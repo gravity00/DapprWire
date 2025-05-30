@@ -1,10 +1,9 @@
-﻿using System.Data;
-using System.Data.Common;
+﻿using System.Data.Common;
 
 namespace DapperWire;
 
 /// <summary>
-/// Represents a database connection.
+/// Represents a factory for creating database connections.
 /// </summary>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
@@ -13,161 +12,37 @@ public class Database(
     DbConnectionFactory dbConnectionFactory
 ) : IDatabase
 {
-    private bool _disposed;
-    private DbConnection? _connection;
-    private DbTransaction? _transaction;
-
-    #region Disposables
-
-    /// <summary>
-    /// Finalizes the database connection.
-    /// </summary>
-    ~Database() => Dispose(false);
-
     /// <inheritdoc />
-    public void Dispose()
+    public virtual async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+        var database = CreateDatabase();
 
-    /// <summary>
-    /// Disposes the database connection.
-    /// </summary>
-    /// <param name="disposing">Is the connection explicitly being disposed</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
+        try
         {
-            _transaction?.Dispose();
-            _connection?.Dispose();
+            await database.ConnectAsync(ct).ConfigureAwait(false);
         }
-
-        _transaction = null;
-        _connection = null;
-        _disposed = true;
-    }
-
+        catch
+        {
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsyncCore().ConfigureAwait(false);
-        Dispose(false);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Disposes the database connection asynchronously.
-    /// </summary>
-    /// <returns>A task to be awaited for the result.</returns>
-    protected virtual async ValueTask DisposeAsyncCore()
-    {
-        if (_transaction is not null)
-            await _transaction.DisposeAsync().ConfigureAwait(false);
-
-        if (_connection is not null)
-            await _connection.DisposeAsync().ConfigureAwait(false);
-
-        _transaction = null;
-        _connection = null;
-        _disposed = true;
-    }
-
-#endif
-
-    #endregion
-
-    /// <inheritdoc />
-    public virtual async Task<IDatabaseTransaction> BeginTransactionAsync(
-        IsolationLevel isolationLevel,
-        CancellationToken ct
-    )
-    {
-        EnsureNotDisposed();
-
-        if (_transaction is not null)
-            throw new InvalidOperationException("A transaction is already in progress.");
-
-        var result = await GetDbConnectionAsync(ct).ConfigureAwait(false);
-
-        if (isolationLevel == default)
-            isolationLevel = options.DefaultIsolationLevel;
-
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-        var transaction = await result.Connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
+            await database.DisposeAsync().ConfigureAwait(false);
 #else
-        var transaction = result.Connection.BeginTransaction(isolationLevel);
+            database.Dispose();
 #endif
-
-        _transaction = transaction;
-
-        return new DatabaseTransaction(transaction, () =>
-        {
-            _transaction = null;
-        });
-    }
-
-    /// <summary>
-    /// Connects to the database asynchronously.
-    /// </summary>
-    /// <remarks>
-    /// If the connection is already open, this method does nothing.
-    /// </remarks>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
-    /// <exception cref="ObjectDisposedException"></exception>
-    public virtual async Task ConnectAsync(CancellationToken ct) => await GetDbConnectionAsync(ct).ConfigureAwait(false);
-
-    /// <summary>
-    /// Ensures the database connection is initialized and opens it if necessary.
-    /// </summary>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
-    /// <exception cref="ObjectDisposedException"></exception>
-    protected virtual async Task<GetDbConnectionResult> GetDbConnectionAsync(CancellationToken ct)
-    {
-        EnsureNotDisposed();
-
-        bool isNew;
-        if (_connection == null)
-        {
-            isNew = true;
-            _connection = dbConnectionFactory();
+            throw;
         }
-        else
-            isNew = false;
 
-        bool wasOpen;
-        if (_connection.State is not ConnectionState.Open)
-        {
-            wasOpen = false;
-            await _connection.OpenAsync(ct).ConfigureAwait(false);
-
-            if (options.OnConnectionOpen is not null)
-                await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
-
-        }
-        else
-            wasOpen = true;
-
-        return new GetDbConnectionResult(_connection, isNew, wasOpen);
+        return database;
     }
 
     /// <summary>
-    /// Ensures that the database connection has not been disposed.
+    /// Creates a new database instance.
     /// </summary>
-    /// <exception cref="ObjectDisposedException"></exception>
-    protected void EnsureNotDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(nameof(Database));
-    }
+    /// <returns>The database instance.</returns>
+    protected virtual DatabaseSession CreateDatabase() => new(options, dbConnectionFactory);
 }
 
 /// <summary>
-/// Represents a strongly-typed database connection.
+/// Represents a strongly-typed factory for creating database connections.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
 /// <param name="options">The database options.</param>
@@ -175,5 +50,5 @@ public class Database(
 public class Database<TName>(
     DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : Database(options, () => dbConnectionFactory()), IDatabase<TName>
+) : Database(options , () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;

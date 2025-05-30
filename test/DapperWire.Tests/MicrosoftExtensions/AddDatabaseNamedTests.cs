@@ -13,10 +13,10 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
             builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
         });
         
-        var databaseFactory = host.Services.GetService<IDatabaseFactory<TestDatabaseName>>();
+        var databaseFactory = host.Services.GetService<IDatabase<TestDatabaseName>>();
         
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabaseFactory<TestDatabaseName>>(databaseFactory);
+        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -29,10 +29,10 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabase<TestDatabaseName>>();
+        var database = scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>();
         
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(database);
+        Assert.IsType<MicrosoftExtensionsDatabaseSession<TestDatabaseName>>(database);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
         });
 
         Assert.Throws<InvalidOperationException>(
-            () => host.Services.GetService<IDatabase<TestDatabaseName>>()
+            () => host.Services.GetService<IDatabaseSession<TestDatabaseName>>()
         );
     }
 
@@ -56,7 +56,7 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
             builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
         });
 
-        var databaseFactory = host.Services.GetService<IDatabaseFactory>();
+        var databaseFactory = host.Services.GetService<IDatabase>();
 
         Assert.Null(databaseFactory);
     }
@@ -71,7 +71,7 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabase>();
+        var database = scope.ServiceProvider.GetService<IDatabaseSession>();
 
         Assert.Null(database);
     }

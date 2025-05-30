@@ -30,8 +30,8 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabaseFactory, MicrosoftExtensionsDatabaseFactory>();
-        services.AddScoped<IDatabase, MicrosoftExtensionsDatabase>();
+        services.AddSingleton<IDatabase, MicrosoftExtensionsDatabase>();
+        services.AddScoped<IDatabaseSession, MicrosoftExtensionsDatabaseSession>();
 
         return services;
     }
@@ -58,8 +58,8 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabaseFactory<TName>, MicrosoftExtensionsDatabaseFactory<TName>>();
-        services.AddScoped<IDatabase<TName>, MicrosoftExtensionsDatabase<TName>>();
+        services.AddSingleton<IDatabase<TName>, MicrosoftExtensionsDatabase<TName>>();
+        services.AddScoped<IDatabaseSession<TName>, MicrosoftExtensionsDatabaseSession<TName>>();
 
         return services;
     }
@@ -82,8 +82,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddDatabase<TName>(connectionFactory, config);
 
-        services.AddSingleton<IDatabaseFactory>(s => s.GetRequiredService<IDatabaseFactory<TName>>());
-        services.AddScoped<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
+        services.AddSingleton<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
+        services.AddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
 
         return services;
     }

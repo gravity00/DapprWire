@@ -13,10 +13,10 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
             builder.Services.AddDatabaseAsDefault<TestDatabaseName>(_ => fixture.GetDbConnection());
         });
         
-        var databaseFactory = host.Services.GetService<IDatabaseFactory<TestDatabaseName>>();
+        var databaseFactory = host.Services.GetService<IDatabase<TestDatabaseName>>();
         
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabaseFactory<TestDatabaseName>>(databaseFactory);
+        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -29,10 +29,10 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabase<TestDatabaseName>>();
+        var database = scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>();
         
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(database);
+        Assert.IsType<MicrosoftExtensionsDatabaseSession<TestDatabaseName>>(database);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
         });
 
         Assert.Throws<InvalidOperationException>(
-            () => host.Services.GetService<IDatabase<TestDatabaseName>>()
+            () => host.Services.GetService<IDatabaseSession<TestDatabaseName>>()
         );
     }
 
@@ -56,10 +56,10 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
             builder.Services.AddDatabaseAsDefault<TestDatabaseName>(_ => fixture.GetDbConnection());
         });
 
-        var databaseFactory = host.Services.GetService<IDatabaseFactory>();
+        var databaseFactory = host.Services.GetService<IDatabase>();
 
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabaseFactory<TestDatabaseName>>(databaseFactory);
+        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -72,9 +72,9 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabase>();
+        var database = scope.ServiceProvider.GetService<IDatabaseSession>();
 
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(database);
+        Assert.IsType<MicrosoftExtensionsDatabaseSession<TestDatabaseName>>(database);
     }
 }
