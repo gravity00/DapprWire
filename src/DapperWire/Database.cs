@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using Microsoft.Extensions.Options;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
 /// Represents a factory for creating database connections.

@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
 /// Delegate for creating <see cref="DbConnection"/> instances.

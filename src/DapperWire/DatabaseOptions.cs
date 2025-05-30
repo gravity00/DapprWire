@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Data.Common;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
 /// Represents options for configuring the database connection.

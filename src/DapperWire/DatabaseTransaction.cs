@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace DapperWire;
+﻿namespace DapperWire;
 
 /// <summary>
 /// Represents a database transaction.

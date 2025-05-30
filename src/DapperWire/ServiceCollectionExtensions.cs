@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using DapperWire;
+﻿using DapperWire;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
