@@ -30,8 +30,8 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabase, MicrosoftExtensionsDatabase>();
-        services.AddScoped<IDatabaseSession, MicrosoftExtensionsDatabaseSession>();
+        services.AddSingleton<IDatabase, Database>();
+        services.AddScoped<IDatabaseSession, DatabaseSession>();
 
         return services;
     }
@@ -58,8 +58,8 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabase<TName>, MicrosoftExtensionsDatabase<TName>>();
-        services.AddScoped<IDatabaseSession<TName>, MicrosoftExtensionsDatabaseSession<TName>>();
+        services.AddSingleton<IDatabase<TName>, Database<TName>>();
+        services.AddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
 
         return services;
     }

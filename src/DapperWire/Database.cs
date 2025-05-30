@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Microsoft.Extensions.Options;
 
 namespace DapperWire;
 
@@ -8,14 +9,14 @@ namespace DapperWire;
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class Database(
-    DatabaseOptions options,
+    IOptions<DatabaseOptions> options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabase
 {
     /// <inheritdoc />
-    public virtual async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
+    public async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
     {
-        var database = CreateDatabase();
+        var database = new DatabaseSession(options, dbConnectionFactory);
 
         try
         {
@@ -33,12 +34,6 @@ public class Database(
 
         return database;
     }
-
-    /// <summary>
-    /// Creates a new database instance.
-    /// </summary>
-    /// <returns>The database instance.</returns>
-    protected virtual DatabaseSession CreateDatabase() => new(options, dbConnectionFactory);
 }
 
 /// <summary>
@@ -48,7 +43,7 @@ public class Database(
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class Database<TName>(
-    DatabaseOptions options,
+    IOptions<DatabaseOptions> options,
     DbConnectionFactory<TName> dbConnectionFactory
 ) : Database(options , () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;

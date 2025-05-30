@@ -16,7 +16,7 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
         var databaseFactory = host.Services.GetService<IDatabase<TestDatabaseName>>();
         
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(databaseFactory);
+        Assert.IsType<Database<TestDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
         var database = scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>();
         
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabaseSession<TestDatabaseName>>(database);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(database);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
         var databaseFactory = host.Services.GetService<IDatabase>();
 
         Assert.NotNull(databaseFactory);
-        Assert.IsType<MicrosoftExtensionsDatabase<TestDatabaseName>>(databaseFactory);
+        Assert.IsType<Database<TestDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -75,6 +75,6 @@ public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutput
         var database = scope.ServiceProvider.GetService<IDatabaseSession>();
 
         Assert.NotNull(database);
-        Assert.IsType<MicrosoftExtensionsDatabaseSession<TestDatabaseName>>(database);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(database);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using Microsoft.Extensions.Options;
 
 namespace DapperWire;
 
@@ -9,13 +10,15 @@ namespace DapperWire;
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession(
-    DatabaseOptions options,
+    IOptions<DatabaseOptions> options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabaseSession
 {
     private bool _disposed;
     private DbConnection? _connection;
     private DbTransaction? _transaction;
+
+    private DatabaseOptions Options => options.Value;
 
     #region Disposables
 
@@ -80,7 +83,7 @@ public class DatabaseSession(
     #endregion
 
     /// <inheritdoc />
-    public virtual async Task<IDatabaseTransaction> BeginTransactionAsync(
+    public async Task<IDatabaseTransaction> BeginTransactionAsync(
         IsolationLevel isolationLevel,
         CancellationToken ct
     )
@@ -90,15 +93,15 @@ public class DatabaseSession(
         if (_transaction is not null)
             throw new InvalidOperationException("A transaction is already in progress.");
 
-        var result = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
         if (isolationLevel == default)
-            isolationLevel = options.DefaultIsolationLevel;
+            isolationLevel = Options.DefaultIsolationLevel;
 
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-        var transaction = await result.Connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
+        var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
 #else
-        var transaction = result.Connection.BeginTransaction(isolationLevel);
+        var transaction = connection.BeginTransaction(isolationLevel);
 #endif
 
         _transaction = transaction;
@@ -126,33 +129,22 @@ public class DatabaseSession(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
-    protected virtual async Task<GetDbConnectionResult> GetDbConnectionAsync(CancellationToken ct)
+    protected virtual async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
     {
         EnsureNotDisposed();
 
-        bool isNew;
-        if (_connection == null)
-        {
-            isNew = true;
-            _connection = dbConnectionFactory();
-        }
-        else
-            isNew = false;
+        _connection ??= dbConnectionFactory();
 
-        bool wasOpen;
         if (_connection.State is not ConnectionState.Open)
         {
-            wasOpen = false;
             await _connection.OpenAsync(ct).ConfigureAwait(false);
 
-            if (options.OnConnectionOpen is not null)
-                await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
+            if (Options.OnConnectionOpen is not null)
+                await Options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
 
         }
-        else
-            wasOpen = true;
 
-        return new GetDbConnectionResult(_connection, isNew, wasOpen);
+        return _connection;
     }
 
     /// <summary>
@@ -173,7 +165,7 @@ public class DatabaseSession(
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession<TName>(
-    DatabaseOptions options,
+    IOptions<DatabaseOptions> options,
     DbConnectionFactory<TName> dbConnectionFactory
 ) : DatabaseSession(options, () => dbConnectionFactory()), IDatabaseSession<TName>
     where TName : IDatabaseName;
