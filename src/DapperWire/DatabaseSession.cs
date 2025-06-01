@@ -3,18 +3,18 @@
 /// <summary>
 /// Represents a database connection.
 /// </summary>
+/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession(
-    IOptions<DatabaseOptions> options,
+    DatabaseLogger logger,
+    DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabaseSession
 {
     private bool _disposed;
     private DbConnection? _connection;
     private DbTransaction? _transaction;
-
-    private DatabaseOptions Options => options.Value;
 
     #region Disposables
 
@@ -92,7 +92,7 @@ public class DatabaseSession(
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
         if (isolationLevel == default)
-            isolationLevel = Options.DefaultIsolationLevel;
+            isolationLevel = options.DefaultIsolationLevel;
 
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
@@ -129,16 +129,22 @@ public class DatabaseSession(
     {
         EnsureNotDisposed();
 
-        _connection ??= dbConnectionFactory();
-
-        if (_connection.State is not ConnectionState.Open)
+        if (_connection is null)
         {
-            await _connection.OpenAsync(ct).ConfigureAwait(false);
-
-            if (Options.OnConnectionOpen is not null)
-                await Options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
-
+            Log(DatabaseLogLevel.Debug, null, "Creating a new database connection...");
+            _connection = dbConnectionFactory();
         }
+
+        if (_connection.State is ConnectionState.Open)
+            return _connection;
+
+        Log(DatabaseLogLevel.Debug, null, "Opening the database connection...");
+        await _connection.OpenAsync(ct).ConfigureAwait(false);
+
+        if (options.OnConnectionOpen is not null)
+            await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
+
+        Log(DatabaseLogLevel.Information, null, "Database connection opened successfully.");
 
         return _connection;
     }
@@ -152,16 +158,25 @@ public class DatabaseSession(
         if (_disposed)
             throw new ObjectDisposedException(nameof(DatabaseSession));
     }
+
+    private void Log(
+        DatabaseLogLevel level,
+        Exception? exception,
+        string message,
+        params object?[] args
+    ) => logger(typeof(DatabaseSession), level, exception, message, args);
 }
 
 /// <summary>
 /// Represents a strongly-typed database connection.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
+/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession<TName>(
-    IOptions<DatabaseOptions> options,
+    DatabaseLogger logger,
+    DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : DatabaseSession(options, () => dbConnectionFactory()), IDatabaseSession<TName>
+) : DatabaseSession(logger, options, () => dbConnectionFactory()), IDatabaseSession<TName>
     where TName : IDatabaseName;

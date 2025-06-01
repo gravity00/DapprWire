@@ -1,4 +1,5 @@
-﻿using DapperWire;
+﻿using System.Collections.Concurrent;
+using DapperWire;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,9 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
+        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
+
+        services.AddSingleton(DatabaseLoggerFactory);
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase, Database>();
         services.AddScoped<IDatabaseSession, DatabaseSession>();
@@ -56,6 +60,9 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
+        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
+
+        services.AddSingleton(DatabaseLoggerFactory);
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase<TName>, Database<TName>>();
         services.AddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
@@ -85,5 +92,33 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
 
         return services;
+    }
+
+    private static DatabaseLogger DatabaseLoggerFactory(IServiceProvider s)
+    {
+        var loggerFactory = s.GetRequiredService<ILoggerFactory>();
+        var loggerCache = new ConcurrentDictionary<Type, ILogger>();
+        return (type, level, exception, message, args) =>
+        {
+            var logger = loggerCache.GetOrAdd(type, t => loggerFactory.CreateLogger(t));
+            switch (level)
+            {
+                case DatabaseLogLevel.Debug:
+                    logger.LogDebug(0, exception, message, args);
+                    break;
+                case DatabaseLogLevel.Information:
+                    logger.LogInformation(0, exception, message, args);
+                    break;
+                case DatabaseLogLevel.Warning:
+                    logger.LogWarning(0, exception, message, args);
+                    break;
+                case DatabaseLogLevel.Error:
+                    logger.LogError(0, exception, message, args);
+                    break;
+                case DatabaseLogLevel.Undefined:
+                default:
+                    break;
+            }
+        };
     }
 }

@@ -3,17 +3,20 @@
 /// <summary>
 /// Represents a factory for creating database connections.
 /// </summary>
+/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class Database(
-    IOptions<DatabaseOptions> options,
+    DatabaseLogger logger,
+    DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabase
 {
     /// <inheritdoc />
     public async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
     {
-        var database = new DatabaseSession(options, dbConnectionFactory);
+        Log(DatabaseLogLevel.Debug, null, "Starting a new database session...");
+        var database = new DatabaseSession(logger, options, dbConnectionFactory);
 
         try
         {
@@ -29,18 +32,29 @@ public class Database(
             throw;
         }
 
+        Log(DatabaseLogLevel.Information, null, "Database session started successfully.");
+
         return database;
     }
+
+    private void Log(
+        DatabaseLogLevel level,
+        Exception? exception,
+        string message,
+        params object?[] args
+    ) => logger(typeof(Database), level, exception, message, args);
 }
 
 /// <summary>
 /// Represents a strongly-typed factory for creating database connections.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
+/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class Database<TName>(
-    IOptions<DatabaseOptions> options,
+    DatabaseLogger logger,
+    DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : Database(options , () => dbConnectionFactory()), IDatabase<TName>
+) : Database(logger, options , () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;
