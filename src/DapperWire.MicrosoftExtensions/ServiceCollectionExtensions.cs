@@ -1,5 +1,8 @@
 ﻿using System.Collections.Concurrent;
+using System.Data.Common;
 using DapperWire;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -23,15 +26,14 @@ public static class ServiceCollectionExtensions
         Action<DatabaseOptions>? config = null
     )
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+        if (services is null) throw new ArgumentNullException(nameof(services));
+        if (connectionFactory is null) throw new ArgumentNullException(nameof(connectionFactory));
 
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
-
         services.AddSingleton(DatabaseLoggerFactory);
+        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase, Database>();
         services.AddScoped<IDatabaseSession, DatabaseSession>();
@@ -42,7 +44,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// Adds the strongly-typed database services to the service collection.
     /// </summary>
-    /// <typeparam name="TName"></typeparam>
+    /// <typeparam name="TName">The database name.</typeparam>
     /// <param name="services">The service collection.</param>
     /// <param name="connectionFactory">The connection factory.</param>
     /// <param name="config">An optional callback to configure database options.</param>
@@ -54,15 +56,14 @@ public static class ServiceCollectionExtensions
         Action<DatabaseOptions>? config = null
     ) where TName : IDatabaseName
     {
-        if (services == null) throw new ArgumentNullException(nameof(services));
-        if (connectionFactory == null) throw new ArgumentNullException(nameof(connectionFactory));
+        if (services is null) throw new ArgumentNullException(nameof(services));
+        if (connectionFactory is null) throw new ArgumentNullException(nameof(connectionFactory));
 
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
-
         services.AddSingleton(DatabaseLoggerFactory);
+        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase<TName>, Database<TName>>();
         services.AddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
@@ -74,7 +75,7 @@ public static class ServiceCollectionExtensions
     /// Adds the strongly-typed database services to the service collection while also
     /// being considered the default database for resolution purposes.
     /// </summary>
-    /// <typeparam name="TName"></typeparam>
+    /// <typeparam name="TName">The database name.</typeparam>
     /// <param name="services">The service collection.</param>
     /// <param name="connectionFactory">The connection factory.</param>
     /// <param name="config">An optional callback to configure database options.</param>
@@ -101,24 +102,14 @@ public static class ServiceCollectionExtensions
         return (type, level, exception, message, args) =>
         {
             var logger = loggerCache.GetOrAdd(type, t => loggerFactory.CreateLogger(t));
-            switch (level)
-            {
-                case DatabaseLogLevel.Debug:
-                    logger.LogDebug(0, exception, message, args);
-                    break;
-                case DatabaseLogLevel.Information:
-                    logger.LogInformation(0, exception, message, args);
-                    break;
-                case DatabaseLogLevel.Warning:
-                    logger.LogWarning(0, exception, message, args);
-                    break;
-                case DatabaseLogLevel.Error:
-                    logger.LogError(0, exception, message, args);
-                    break;
-                case DatabaseLogLevel.Undefined:
-                default:
-                    break;
-            }
+            if (level == DatabaseLogLevel.Debug)
+                logger.LogDebug(0, exception, message, args);
+            else if (level == DatabaseLogLevel.Info)
+                logger.LogInformation(0, exception, message, args);
+            else if (level == DatabaseLogLevel.Warn)
+                logger.LogWarning(0, exception, message, args);
+            else if (level == DatabaseLogLevel.Error)
+                logger.LogError(0, exception, message, args);
         };
     }
 }

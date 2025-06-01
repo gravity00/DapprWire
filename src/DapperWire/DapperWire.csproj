@@ -9,8 +9,6 @@
   <ItemGroup>
     <Using Include="System.Data" />
     <Using Include="System.Data.Common" />
-    <Using Include="Microsoft.Extensions.Logging" />
-    <Using Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,9 +17,6 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

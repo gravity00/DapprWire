@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapperWire.MicrosoftExtensions", "src\DapperWire.MicrosoftExtensions\DapperWire.MicrosoftExtensions.csproj", "{47CCC6D8-A44F-4135-92DE-A412830A054F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47CCC6D8-A44F-4135-92DE-A412830A054F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47CCC6D8-A44F-4135-92DE-A412830A054F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47CCC6D8-A44F-4135-92DE-A412830A054F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47CCC6D8-A44F-4135-92DE-A412830A054F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +60,7 @@ Global
 		{EB941EDB-4717-4A18-92C4-78CC93FC10B3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51} = {1DFF32AC-7E13-4C03-84C5-71F77C3FFF7F}
 		{37E086FC-B975-4322-9D5A-9D79CC2224CD} = {8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}
+		{47CCC6D8-A44F-4135-92DE-A412830A054F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9FA0660B-4CB8-4E50-90F9-FE695F3BF13E}
