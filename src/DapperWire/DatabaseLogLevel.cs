@@ -16,11 +16,11 @@ public enum DatabaseLogLevel
     /// <summary>
     /// Indicates an informational log level.
     /// </summary>
-    Information,
+    Info,
     /// <summary>
     /// Indicates a warning log level.
     /// </summary>
-    Warning,
+    Warn,
     /// <summary>
     /// Indicates an error log level.
     /// </summary>

@@ -94,6 +94,7 @@ public class DatabaseSession(
         if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
+        logger.Debug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
 #else
@@ -101,6 +102,8 @@ public class DatabaseSession(
 #endif
 
         _transaction = transaction;
+
+        logger.Info<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
         return new DatabaseTransaction(transaction, () =>
         {
@@ -131,20 +134,20 @@ public class DatabaseSession(
 
         if (_connection is null)
         {
-            Log(DatabaseLogLevel.Debug, null, "Creating a new database connection...");
+            logger.Debug<DatabaseSession>("Creating a new database connection...");
             _connection = dbConnectionFactory();
         }
 
         if (_connection.State is ConnectionState.Open)
             return _connection;
 
-        Log(DatabaseLogLevel.Debug, null, "Opening the database connection...");
+        logger.Debug<DatabaseSession>("Opening the database connection...");
         await _connection.OpenAsync(ct).ConfigureAwait(false);
 
         if (options.OnConnectionOpen is not null)
             await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
 
-        Log(DatabaseLogLevel.Information, null, "Database connection opened successfully.");
+        logger.Info<DatabaseSession>("Database connection opened successfully.");
 
         return _connection;
     }
@@ -158,13 +161,6 @@ public class DatabaseSession(
         if (_disposed)
             throw new ObjectDisposedException(nameof(DatabaseSession));
     }
-
-    private void Log(
-        DatabaseLogLevel level,
-        Exception? exception,
-        string message,
-        params object?[] args
-    ) => logger(typeof(DatabaseSession), level, exception, message, args);
 }
 
 /// <summary>

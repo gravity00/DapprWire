@@ -15,7 +15,7 @@ public class Database(
     /// <inheritdoc />
     public async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
     {
-        Log(DatabaseLogLevel.Debug, null, "Starting a new database session...");
+        logger.Debug<Database>("Starting a new database session...");
         var database = new DatabaseSession(logger, options, dbConnectionFactory);
 
         try
@@ -32,17 +32,10 @@ public class Database(
             throw;
         }
 
-        Log(DatabaseLogLevel.Information, null, "Database session started successfully.");
+        logger.Info<Database>("Database session started successfully.");
 
         return database;
     }
-
-    private void Log(
-        DatabaseLogLevel level,
-        Exception? exception,
-        string message,
-        params object?[] args
-    ) => logger(typeof(Database), level, exception, message, args);
 }
 
 /// <summary>
