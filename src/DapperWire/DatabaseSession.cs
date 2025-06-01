@@ -105,7 +105,7 @@ public class DatabaseSession(
 
         logger.Info<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
-        return new DatabaseTransaction(transaction, () =>
+        return new DatabaseTransaction(logger, transaction, () =>
         {
             _transaction = null;
         });
