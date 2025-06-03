@@ -1,4 +1,4 @@
-﻿namespace DapperWire.Core.Databases;
+﻿namespace DapperWire.Core;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseConnectTests(DatabaseFixture fixture, ITestOutputHelper output)
