@@ -6,24 +6,11 @@ internal static class DatabaseLoggerExtensions
         this DatabaseLogger logger,
         string message,
         params object?[] args
-    ) => logger(typeof(T), DatabaseLogLevel.Debug, null, message, args);
+    ) => logger.Log<T>(DatabaseLogLevel.Debug, null, message, args);
 
     public static void Info<T>(
         this DatabaseLogger logger,
         string message,
         params object?[] args
-    ) => logger(typeof(T), DatabaseLogLevel.Info, null, message, args);
-
-    public static void Warn<T>(
-        this DatabaseLogger logger,
-        string message,
-        params object?[] args
-    ) => logger(typeof(T), DatabaseLogLevel.Warn, null, message, args);
-
-    public static void Error<T>(
-        this DatabaseLogger logger,
-        Exception? exception,
-        string message,
-        params object?[] args
-    ) => logger(typeof(T), DatabaseLogLevel.Error, exception, message, args);
+    ) => logger.Log<T>(DatabaseLogLevel.Info, null, message, args);
 }

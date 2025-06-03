@@ -1,7 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.Data.Common;
+﻿using System.Data.Common;
 using DapperWire;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
@@ -32,7 +30,7 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton(DatabaseLoggerFactory);
+        services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
         services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase, Database>();
@@ -62,7 +60,7 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton(DatabaseLoggerFactory);
+        services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
         services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase<TName>, Database<TName>>();
@@ -93,23 +91,5 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
 
         return services;
-    }
-
-    private static DatabaseLogger DatabaseLoggerFactory(IServiceProvider s)
-    {
-        var loggerFactory = s.GetRequiredService<ILoggerFactory>();
-        var loggerCache = new ConcurrentDictionary<Type, ILogger>();
-        return (type, level, exception, message, args) =>
-        {
-            var logger = loggerCache.GetOrAdd(type, t => loggerFactory.CreateLogger(t));
-            if (level == DatabaseLogLevel.Debug)
-                logger.LogDebug(0, exception, message, args);
-            else if (level == DatabaseLogLevel.Info)
-                logger.LogInformation(0, exception, message, args);
-            else if (level == DatabaseLogLevel.Warn)
-                logger.LogWarning(0, exception, message, args);
-            else if (level == DatabaseLogLevel.Error)
-                logger.LogError(0, exception, message, args);
-        };
     }
 }

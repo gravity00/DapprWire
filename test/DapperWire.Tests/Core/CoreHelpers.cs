@@ -16,19 +16,16 @@ public static class CoreHelpers
             DefaultTimeout = 5
         };
         config?.Invoke(options);
-        return new Database(Log, options, dbConnectionFactory);
+        return new Database(new TestDatabaseLogger(output), options, dbConnectionFactory);
+    }
 
-        void Log(
-            Type type,
-            DatabaseLogLevel logLevel,
-            Exception? exception,
-            string message,
-            params object?[] args
-        )
+    private class TestDatabaseLogger(ITestOutputHelper output) : DatabaseLogger
+    {
+        public override void Log<T>(DatabaseLogLevel level, Exception? exception, string message, params object?[] args)
         {
             try
             {
-                output.WriteLine($"[{logLevel}] {type.Name} {message}");
+                output.WriteLine($"[{level}] {typeof(T).Name} {message}");
                 if (args.Length > 0)
                     output.WriteLine($"  Args: {string.Join("|", args)}");
                 if (exception is not null)
@@ -39,5 +36,7 @@ public static class CoreHelpers
 
             }
         }
+
+        public override bool IsEnabled<T>(DatabaseLogLevel level) => true;
     }
 }
