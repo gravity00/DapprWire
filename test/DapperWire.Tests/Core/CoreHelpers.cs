@@ -25,7 +25,7 @@ public static class CoreHelpers
         {
             try
             {
-                output.WriteLine($"[{level}] {typeof(T).Name} {message}");
+                output.WriteLine($"{DateTimeOffset.UtcNow:O} [{level}] {typeof(T).FullName} | {message}");
                 if (args.Length > 0)
                     output.WriteLine($"  Args: {string.Join("|", args)}");
                 if (exception is not null)
