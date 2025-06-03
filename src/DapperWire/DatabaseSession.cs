@@ -94,7 +94,7 @@ public class DatabaseSession(
         if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
-        logger.Debug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
+        logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
 #else
@@ -103,7 +103,7 @@ public class DatabaseSession(
 
         _transaction = transaction;
 
-        logger.Info<DatabaseSession>("Database transaction started successfully", isolationLevel);
+        logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
         return new DatabaseTransaction(logger, transaction, () =>
         {
@@ -134,20 +134,20 @@ public class DatabaseSession(
 
         if (_connection is null)
         {
-            logger.Debug<DatabaseSession>("Creating a new database connection...");
+            logger.LogDebug<DatabaseSession>("Creating a new database connection...");
             _connection = dbConnectionFactory();
         }
 
         if (_connection.State is ConnectionState.Open)
             return _connection;
 
-        logger.Debug<DatabaseSession>("Opening the database connection...");
+        logger.LogDebug<DatabaseSession>("Opening the database connection...");
         await _connection.OpenAsync(ct).ConfigureAwait(false);
 
         if (options.OnConnectionOpen is not null)
             await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
 
-        logger.Info<DatabaseSession>("Database connection opened successfully.");
+        logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
 
         return _connection;
     }
