@@ -1,8 +1,38 @@
 ﻿namespace DapperWire.Core;
 
 [Collection(nameof(RequireDatabase))]
-public class DatabaseConnectTests(DatabaseFixture fixture, ITestOutputHelper output)
+public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
+    [Fact]
+    public void Constructor_NullDatabaseLogger_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database(
+            null!,
+            CoreHelpers.CreateDatabaseOptions(),
+            fixture.GetDbConnection
+        ));
+    }
+
+    [Fact]
+    public void Constructor_NullDatabaseOptions_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database(
+            CoreHelpers.CreateDatabaseLogger(output),
+            null!,
+            fixture.GetDbConnection
+        ));
+    }
+
+    [Fact]
+    public void Constructor_NullDbConnectionFactory_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database(
+            CoreHelpers.CreateDatabaseLogger(output),
+            CoreHelpers.CreateDatabaseOptions(),
+            null!
+        ));
+    }
+
     [Fact]
     public async Task Connect_Succeed()
     {

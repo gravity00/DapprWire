@@ -6,17 +6,22 @@
 /// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
+/// <exception cref="ArgumentNullException"></exception>
 public class Database(
     DatabaseLogger logger,
     DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabase
 {
+    private readonly DatabaseLogger _logger = logger.NotNull(nameof(logger));
+    private readonly DatabaseOptions _options = options.NotNull(nameof(options));
+    private readonly DbConnectionFactory _dbConnectionFactory = dbConnectionFactory.NotNull(nameof(dbConnectionFactory));
+
     /// <inheritdoc />
     public async Task<IDatabaseSession> ConnectAsync(CancellationToken ct)
     {
-        logger.LogDebug<Database>("Starting a new database session...");
-        var database = new DatabaseSession(logger, options, dbConnectionFactory);
+        _logger.LogDebug<Database>("Starting a new database session...");
+        var database = new DatabaseSession(_logger, _options, _dbConnectionFactory);
 
         try
         {
@@ -32,7 +37,7 @@ public class Database(
             throw;
         }
 
-        logger.LogInfo<Database>("Database session started successfully.");
+        _logger.LogInfo<Database>("Database session started successfully.");
 
         return database;
     }
@@ -45,9 +50,10 @@ public class Database(
 /// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
+/// <exception cref="ArgumentNullException"></exception>
 public class Database<TName>(
     DatabaseLogger logger,
     DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : Database(logger, options , () => dbConnectionFactory()), IDatabase<TName>
+) : Database(logger, options, () => dbConnectionFactory()), IDatabase<TName>
     where TName : IDatabaseName;
