@@ -1,4 +1,4 @@
-﻿namespace DapperWire.Core;
+﻿namespace DapperWire.Core.Databases;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
@@ -41,6 +41,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         await using var session = await database.ConnectAsync(CancellationToken.None);
 
         Assert.NotNull(session);
+        Assert.IsType<DatabaseSession>(session);
     }
 
     [Fact]
