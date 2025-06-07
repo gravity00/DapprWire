@@ -17,7 +17,30 @@ public static class DatabaseSessionExtensions
         CancellationToken ct
     )
     {
-        if (databaseSession == null) throw new ArgumentNullException(nameof(databaseSession));
+        EnsureNotNull(databaseSession);
         return databaseSession.BeginTransactionAsync(default, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command with the specified options.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    public static Task<int> ExecuteAsync(
+        this IDatabaseSession databaseSession,
+        string sql,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteAsync(sql, default, ct);
+    }
+
+    private static void EnsureNotNull(IDatabaseSession databaseSession)
+    {
+        if (databaseSession is null)
+            throw new ArgumentNullException(nameof(databaseSession));
     }
 }

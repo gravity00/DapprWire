@@ -1,4 +1,6 @@
-﻿namespace DapperWire;
+﻿using Dapper;
+
+namespace DapperWire;
 
 /// <summary>
 /// Represents a database connection.
@@ -105,10 +107,22 @@ public class DatabaseSession(
 
         logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
-        return new DatabaseTransaction(logger, transaction, () =>
-        {
-            _transaction = null;
-        });
+        return new DatabaseTransaction(logger, transaction, () => { _transaction = null; });
+    }
+
+    /// <inheritdoc />
+    public async Task<int> ExecuteAsync(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        return await _connection!.ExecuteAsync(command).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -120,7 +134,8 @@ public class DatabaseSession(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
-    public virtual async Task ConnectAsync(CancellationToken ct) => await GetDbConnectionAsync(ct).ConfigureAwait(false);
+    public virtual async Task ConnectAsync(CancellationToken ct) =>
+        await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
     /// <summary>
     /// Ensures the database connection is initialized and opens it if necessary.
@@ -160,6 +175,35 @@ public class DatabaseSession(
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(DatabaseSession));
+    }
+
+    private CommandDefinition CreateCommandDefinition(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    ) => new(
+        sql.NotNull(nameof(sql)),
+        sqlOptions.Parameters,
+        _transaction,
+        sqlOptions.Timeout ?? options.DefaultTimeout,
+        sqlOptions.Type,
+        cancellationToken: ct
+    );
+
+    private void LogCommandDefinition(CommandDefinition command)
+    {
+        if (logger.IsEnabled<DatabaseSession>(DatabaseLogLevel.Debug))
+        {
+            logger.LogDebug<DatabaseSession>(@"Executing SQL command
+[HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
+{CommandText}",
+                command.Parameters is not null,
+                command.Transaction is not null,
+                command.CommandTimeout,
+                command.CommandType,
+                command.CommandText
+            );
+        }
     }
 }
 
