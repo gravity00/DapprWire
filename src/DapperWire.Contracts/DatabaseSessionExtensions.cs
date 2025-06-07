@@ -63,6 +63,49 @@ public static class DatabaseSessionExtensions
     }
 
     /// <summary>
+    /// Executes a SQL command and returns a collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Task<IEnumerable<T>> QueryAsync<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryAsync<T>(sql, default, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Task<IEnumerable<T>> QueryAsync<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryAsync<T>(sql, new SqlOptions
+        {
+            Parameters = parameters
+        }, ct);
+    }
+
+    /// <summary>
     /// Executes a SQL command and returns a single result of type T.
     /// </summary>
     /// <typeparam name="T">The result type.</typeparam>

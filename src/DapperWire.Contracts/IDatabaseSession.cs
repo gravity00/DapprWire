@@ -35,6 +35,20 @@ public interface IDatabaseSession : IDisposable
     );
 
     /// <summary>
+    /// Executes a SQL command and returns a collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    Task<IEnumerable<T>> QueryAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    );
+
+    /// <summary>
     /// Executes a SQL command and returns a single result of type T.
     /// </summary>
     /// <typeparam name="T">The result type.</typeparam>
