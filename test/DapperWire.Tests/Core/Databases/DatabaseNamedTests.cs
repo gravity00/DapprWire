@@ -1,0 +1,66 @@
+﻿namespace DapperWire.Core.Databases;
+
+[Collection(nameof(RequireDatabase))]
+public class DatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper output)
+{
+    [Fact]
+    public void Constructor_NullDatabaseLogger_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database<TestDatabaseName>(
+            null!,
+            CoreHelpers.CreateDatabaseOptions(),
+            fixture.GetDbConnection
+        ));
+    }
+
+    [Fact]
+    public void Constructor_NullDatabaseOptions_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database<TestDatabaseName>(
+            CoreHelpers.CreateDatabaseLogger(output),
+            null!,
+            fixture.GetDbConnection
+        ));
+    }
+
+    [Fact]
+    public void Constructor_NullDbConnectionFactory_Fails()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Database<TestDatabaseName>(
+            CoreHelpers.CreateDatabaseLogger(output),
+            CoreHelpers.CreateDatabaseOptions(),
+            null!
+        ));
+    }
+
+    [Fact]
+    public async Task Connect_Succeed()
+    {
+        var database = CoreHelpers.CreateTestDatabase<TestDatabaseName>(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(CancellationToken.None);
+
+        Assert.NotNull(session);
+        Assert.IsType<DatabaseSession>(session);
+    }
+
+    [Fact]
+    public async Task Options_OnConnectionOpen_Invoked()
+    {
+        var onConnectionOpenInvoked = false;
+        var database = CoreHelpers.CreateTestDatabase<TestDatabaseName>(output, fixture.GetDbConnection, options =>
+        {
+            options.OnConnectionOpen = (session, _) =>
+            {
+                Assert.NotNull(session);
+
+                onConnectionOpenInvoked = true;
+                return Task.CompletedTask;
+            };
+        });
+
+        await using var session = await database.ConnectAsync(CancellationToken.None);
+
+        Assert.True(onConnectionOpenInvoked);
+    }
+}
