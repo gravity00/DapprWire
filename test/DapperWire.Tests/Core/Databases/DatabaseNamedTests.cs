@@ -1,4 +1,6 @@
-﻿namespace DapperWire.Core.Databases;
+﻿using System.Data;
+
+namespace DapperWire.Core.Databases;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper output)
@@ -50,9 +52,10 @@ public class DatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper outpu
         var onConnectionOpenInvoked = false;
         var database = CoreHelpers.CreateTestDatabase<TestDatabaseName>(output, fixture.GetDbConnection, options =>
         {
-            options.OnConnectionOpen = (session, _) =>
+            options.OnConnectionOpen = (dbConnection, _) =>
             {
-                Assert.NotNull(session);
+                Assert.NotNull(dbConnection);
+                Assert.Equal(ConnectionState.Open, dbConnection.State);
 
                 onConnectionOpenInvoked = true;
                 return Task.CompletedTask;
