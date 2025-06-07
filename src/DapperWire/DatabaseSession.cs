@@ -122,7 +122,24 @@ public class DatabaseSession(
         var command = CreateCommandDefinition(sql, sqlOptions, ct);
         LogCommandDefinition(command);
 
-        return await _connection!.ExecuteAsync(command).ConfigureAwait(false);
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.ExecuteAsync(command).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<T?> QuerySingleOrDefaultAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.QuerySingleOrDefaultAsync<T>(command).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -134,7 +151,7 @@ public class DatabaseSession(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
-    public virtual async Task ConnectAsync(CancellationToken ct) =>
+    public async Task ConnectAsync(CancellationToken ct) =>
         await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
     /// <summary>
@@ -143,7 +160,7 @@ public class DatabaseSession(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
-    protected virtual async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
+    protected async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
     {
         EnsureNotDisposed();
 

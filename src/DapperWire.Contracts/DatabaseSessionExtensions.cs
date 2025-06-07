@@ -28,6 +28,7 @@ public static class DatabaseSessionExtensions
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static Task<int> ExecuteAsync(
         this IDatabaseSession databaseSession,
         string sql,
@@ -36,6 +37,25 @@ public static class DatabaseSessionExtensions
     {
         EnsureNotNull(databaseSession);
         return databaseSession.ExecuteAsync(sql, default, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a single result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Task<T?> QuerySingleOrDefaultAsync<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QuerySingleOrDefaultAsync<T>(sql, default, ct);
     }
 
     private static void EnsureNotNull(IDatabaseSession databaseSession)
