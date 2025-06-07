@@ -47,13 +47,26 @@ public class Database(
 /// Represents a strongly-typed factory for creating database connections.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
-/// <param name="logger">The database logger.</param>
-/// <param name="options">The database options.</param>
-/// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
-/// <exception cref="ArgumentNullException"></exception>
-public class Database<TName>(
-    DatabaseLogger logger,
-    DatabaseOptions options,
-    DbConnectionFactory<TName> dbConnectionFactory
-) : Database(logger, options, () => dbConnectionFactory()), IDatabase<TName>
-    where TName : IDatabaseName;
+public class Database<TName> : Database, IDatabase<TName>
+    where TName : IDatabaseName
+{
+    /// <summary>
+    /// Creates a new instance.
+    /// </summary>
+    /// <param name="logger">The database logger.</param>
+    /// <param name="options">The database options.</param>
+    /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public Database(
+        DatabaseLogger logger,
+        DatabaseOptions options,
+        DbConnectionFactory<TName> dbConnectionFactory
+    ) : base(
+        logger.NotNull(nameof(logger)),
+        options.NotNull(nameof(options)),
+        () => dbConnectionFactory()
+    )
+    {
+        dbConnectionFactory.NotNull(nameof(dbConnectionFactory));
+    }
+}
