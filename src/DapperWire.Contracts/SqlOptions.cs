@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DapperWire;
+namespace DapprWire;
 
 /// <summary>
 /// Options for executing a SQL command.

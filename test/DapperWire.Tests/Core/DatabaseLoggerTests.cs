@@ -1,4 +1,4 @@
-﻿namespace DapperWire.Core;
+﻿namespace DapprWire.Core;
 
 public class DatabaseLoggerTests
 {

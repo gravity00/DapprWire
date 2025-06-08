@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 
-namespace DapperWire.Core;
+namespace DapprWire.Core;
 
 public class DatabaseOptionsTests
 {
@@ -12,7 +12,7 @@ public class DatabaseOptionsTests
 
         Assert.Equal(IsolationLevel.ReadCommitted, options.DefaultIsolationLevel);
         Assert.Null(options.OnConnectionOpen);
-        Assert.Null(options.DefaultTimeout);
+        Assert.Null((object?)options.DefaultTimeout);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class DatabaseOptionsTests
         Assert.NotNull(options.OnConnectionOpen);
         Assert.Same(onConnectionOpen, options.OnConnectionOpen);
 
-        Assert.NotNull(options.DefaultTimeout);
+        Assert.NotNull((object?)options.DefaultTimeout);
         Assert.Equal(defaultTimeout, options.DefaultTimeout);
     }
 }

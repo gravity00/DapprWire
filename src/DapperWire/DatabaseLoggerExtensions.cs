@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 internal static class DatabaseLoggerExtensions
 {

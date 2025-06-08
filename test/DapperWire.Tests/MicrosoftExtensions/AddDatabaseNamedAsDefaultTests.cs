@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace DapperWire.MicrosoftExtensions;
+namespace DapprWire.MicrosoftExtensions;
 
 [Collection(nameof(RequireDatabase))]
 public class AddDatabaseNamedAsDefaultTests(DatabaseFixture fixture, ITestOutputHelper output)

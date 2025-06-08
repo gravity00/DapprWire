@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>
 /// Represents a logger for database operations.

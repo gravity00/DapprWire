@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>
 /// Represents options for configuring the database connection.

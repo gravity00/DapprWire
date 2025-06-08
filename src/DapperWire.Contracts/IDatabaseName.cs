@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>  
 /// Represents a database name, for resolution purposes.

@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>
 /// Represents a factory for creating database connections.

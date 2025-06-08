@@ -1,4 +1,4 @@
-﻿namespace DapperWire.Core;
+﻿namespace DapprWire.Core;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper output)

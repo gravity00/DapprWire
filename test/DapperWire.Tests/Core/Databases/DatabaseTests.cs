@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DapperWire.Core.Databases;
+namespace DapprWire.Core.Databases;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)

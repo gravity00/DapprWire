@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace DapperWire.Core;
+namespace DapprWire.Core;
 
 public static class CoreHelpers
 {

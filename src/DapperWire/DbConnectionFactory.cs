@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>
 /// Delegate for creating <see cref="DbConnection"/> instances.

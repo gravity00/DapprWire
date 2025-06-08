@@ -3,7 +3,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
-namespace DapperWire;
+namespace DapprWire;
 
 public sealed class DatabaseFixture : IAsyncLifetime
 {

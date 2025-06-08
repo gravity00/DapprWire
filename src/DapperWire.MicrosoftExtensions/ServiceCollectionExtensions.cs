@@ -1,5 +1,5 @@
 ﻿using System.Data.Common;
-using DapperWire;
+using DapprWire;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace

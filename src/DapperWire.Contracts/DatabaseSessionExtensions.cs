@@ -1,4 +1,4 @@
-﻿namespace DapperWire;
+﻿namespace DapprWire;
 
 /// <summary>
 /// Provides extension methods for <see cref="IDatabaseSession"/> instances.

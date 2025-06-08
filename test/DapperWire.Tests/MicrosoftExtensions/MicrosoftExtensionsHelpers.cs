@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DapperWire.MicrosoftExtensions;
+namespace DapprWire.MicrosoftExtensions;
 
 public static class MicrosoftExtensionsHelpers
 {

@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DapperWire;
+namespace DapprWire;
 
 /// <summary>
 /// Represents a database connection.

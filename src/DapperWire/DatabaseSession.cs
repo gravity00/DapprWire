@@ -1,6 +1,6 @@
 ﻿using Dapper;
 
-namespace DapperWire;
+namespace DapprWire;
 
 /// <summary>
 /// Represents a database connection.
