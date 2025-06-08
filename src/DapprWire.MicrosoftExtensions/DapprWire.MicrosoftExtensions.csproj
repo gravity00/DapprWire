@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DapperWire\DapprWire.csproj" />
+    <ProjectReference Include="..\DapprWire\DapprWire.csproj" />
   </ItemGroup>
 
 </Project>

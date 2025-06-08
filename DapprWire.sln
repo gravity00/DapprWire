@@ -7,11 +7,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1DFF32AC-7E13-4C03-84C5-71F77C3FFF7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.Contracts", "src\DapperWire.Contracts\DapprWire.Contracts.csproj", "{8884F241-5A79-4CFE-8170-EF0436BEF273}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.Contracts", "src\DapprWire.Contracts\DapprWire.Contracts.csproj", "{8884F241-5A79-4CFE-8170-EF0436BEF273}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire", "src\DapperWire\DapprWire.csproj", "{EB941EDB-4717-4A18-92C4-78CC93FC10B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire", "src\DapprWire\DapprWire.csproj", "{EB941EDB-4717-4A18-92C4-78CC93FC10B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.Tests", "test\DapperWire.Tests\DapprWire.Tests.csproj", "{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.MicrosoftExtensions", "src\DapprWire.MicrosoftExtensions\DapprWire.MicrosoftExtensions.csproj", "{47CCC6D8-A44F-4135-92DE-A412830A054F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.Tests", "test\DapprWire.Tests\DapprWire.Tests.csproj", "{05F31B30-ACD4-4D02-BC8D-3644B5CF7C51}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,8 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DapprWire.MicrosoftExtensions", "src\DapperWire.MicrosoftExtensions\DapprWire.MicrosoftExtensions.csproj", "{47CCC6D8-A44F-4135-92DE-A412830A054F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

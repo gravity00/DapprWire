@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DapperWire.MicrosoftExtensions\DapprWire.MicrosoftExtensions.csproj" />
+    <ProjectReference Include="..\..\src\DapprWire.MicrosoftExtensions\DapprWire.MicrosoftExtensions.csproj" />
   </ItemGroup>
 
 </Project>
