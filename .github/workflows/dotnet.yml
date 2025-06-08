@@ -2,8 +2,8 @@ name: Pack Nugets
 
 on:
   push:
-    branches:
-      - refs/tags/v*
+    tags:
+      - v**
   workflow_dispatch:
 
 env:
