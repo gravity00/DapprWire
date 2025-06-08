@@ -35,7 +35,7 @@
 
   <PropertyGroup>
     <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.25159</FileVersion>
+    <FileVersion>1.0.0.25160</FileVersion>
     <VersionPrefix>1.0.0-rc01</VersionPrefix>
   </PropertyGroup>
 
