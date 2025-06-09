@@ -101,3 +101,71 @@ public class ProductsController(
   // ...
 }
 ```
+
+### :white_check_mark: Database Transactions
+
+When you need to manage database transactions, after starting a new transaction **DapprWire** will automatically pass it to **Dapper** when executing any database operation until it is disposed, preventing transactional problems:
+
+```cs
+await using var tx = await databaseSession.BeginTransactionAsync(ct);
+
+var productId = await databaseSession.ExecuteScalarAsync<long>(
+  "insert into Products(Code, Name) values (@Code, @Name);select cast(SCOPE_IDENTITY() as bigint);",
+  new
+  {
+    Code = "12345",
+    Name = "Product 12345"
+  },
+  ct
+);
+
+await databaseSession.ExecuteAsync(
+  "insert into Events(Description) values (@Description)",
+  new
+  {
+    Description = $"Product {productId} was created!"
+  },
+  ct
+);
+
+await tx.CommitAsync(ct);
+```
+
+Keep in mind that, when using multiple databases, **DapprWire** only manages the transaction for each session individually so you need so solve distributed transaction problems on your own.
+
+### :white_check_mark: Logging and Default Options
+
+**DapprWire** has native support for logging, which means that everytime you open a new database session, transaction or execute an SQL command it will be logged, if enabled.
+By default, logging is disabled except when using the `DapprWire.MicrosoftExtensions` package since it will use Microsoft `ILogger` façade so you can manage logging configurations via application settings.
+
+```sh
+2025-06-09T14:40:41.3136668+00:00 [Debug] DapprWire.Database | Starting a new database session...
+2025-06-09T14:40:41.3137026+00:00 [Debug] DapprWire.DatabaseSession | Creating a new database connection...
+2025-06-09T14:40:41.3138825+00:00 [Debug] DapprWire.DatabaseSession | Opening the database connection...
+2025-06-09T14:40:41.3139286+00:00 [Info] DapprWire.DatabaseSession | Database connection opened successfully.
+2025-06-09T14:40:41.3139347+00:00 [Info] DapprWire.Database | Database session started successfully.
+2025-06-09T14:40:41.3140091+00:00 [Debug] DapprWire.DatabaseSession | Starting a new database transaction [IsolationLevel:ReadCommitted]
+2025-06-09T14:40:41.3157917+00:00 [Info] DapprWire.DatabaseSession | Database transaction started successfully
+2025-06-09T14:40:41.3158548+00:00 [Debug] DapprWire.DatabaseSession | Executing SQL command
+[HasParameters:True IsTransactional:True Timeout:<null> Type:<null>]
+insert into Products(Code, Name) values (@Code, @Name);select cast(SCOPE_IDENTITY() as bigint);
+2025-06-09T14:40:41.3168732+00:00 [Debug] DapprWire.DatabaseSession | Executing SQL command
+[HasParameters:True IsTransactional:True Timeout:<null> Type:<null>]
+insert into Events(Description) values (@Description)
+2025-06-09T14:40:41.3180452+00:00 [Debug] DapprWire.DatabaseTransaction | Committing the database transaction...
+2025-06-09T14:40:41.3239587+00:00 [Info] DapprWire.DatabaseTransaction | Database transaction committed successfully.
+```
+
+You can assign your own `DatabaseLogger` and other options, like default command timeout, transaction isolation level and even a callback when a new `DbConnection` is open by configuring the available `DatabaseOptions`.
+When using `DapprWire.MicrosoftExtensions` package you can either configure just like any other `IOptions` using `Configure<DatabaseOptions>(...)` method or pass a configuration callback to the `AddDatabase` methods:
+
+```cs
+var connectionString = builder.Configuration.GetConnectionString("ProductsDatabase");
+builder.Services.AddDatabase(_ => new SqlConnection(connectionString), options =>
+{
+  options.Logger = DatabaseLogger.Null;
+  options.DefaultTimeout = 5;
+  options.DefaultIsolationLevel = IsolationLevel.ReadCommitted;
+});
+```
+
