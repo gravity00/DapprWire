@@ -43,4 +43,12 @@ public class DatabaseOptionsTests
 
         Assert.Equal(isolationLevel, options.DefaultIsolationLevel);
     }
+
+    [Fact]
+    public void Logger_SetNull_ThrowsArgumentNullException()
+    {
+        var options = new DatabaseOptions();
+
+        Assert.Throws<ArgumentNullException>(() => options.Logger = null!);
+    }
 }
