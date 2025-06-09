@@ -141,6 +141,22 @@ public class DatabaseSession(
     }
 
     /// <inheritdoc />
+    public async Task<T> QuerySingleAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.QuerySingleAsync<T>(command).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async Task<T?> QuerySingleOrDefaultAsync<T>(
         string sql,
         SqlOptions sqlOptions,
