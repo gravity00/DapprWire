@@ -2,7 +2,7 @@
 namespace DapprWire.Core.DatabaseSessions;
 
 [Collection(nameof(RequireDatabase))]
-public class DatabaseSessionQueryTests(DatabaseFixture fixture, ITestOutputHelper output)
+public class QueryTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     #region Query
 
