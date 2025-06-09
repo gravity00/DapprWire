@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Text.RegularExpressions;
 
 namespace DapprWire.Core;
 
@@ -82,13 +83,24 @@ where
 
     private class TestDatabaseLogger(ITestOutputHelper output) : DatabaseLogger
     {
+        private static readonly Regex LogParameterRegex = new(@"\{[A-Za-z0-9]+\}", RegexOptions.Compiled);
+
         public override void Log<T>(DatabaseLogLevel level, Exception? exception, string message, params object?[] args)
         {
             try
             {
-                output.WriteLine($"{ DateTimeOffset.UtcNow:O} [{level}] {typeof(T).FullName} | {message}");
                 if (args.Length > 0)
-                    output.WriteLine($"  Args: {string.Join("|", args.Select(e => e ?? "<null>"))}");
+                {
+                    var idx = 0;
+                    message = LogParameterRegex.Replace(message, match =>
+                    {
+                        if (idx < args.Length)
+                            return args[idx++]?.ToString() ?? "<null>";
+                        return match.Value;
+                    });
+                }
+
+                output.WriteLine($"{DateTimeOffset.UtcNow:O} [{level}] {typeof(T).FullName} | {message}");
                 if (exception is not null)
                     output.WriteLine(exception.ToString());
             }
