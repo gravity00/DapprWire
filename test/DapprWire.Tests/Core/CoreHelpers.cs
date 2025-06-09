@@ -4,14 +4,18 @@ namespace DapprWire.Core;
 
 public static class CoreHelpers
 {
-    public static DatabaseOptions CreateDatabaseOptions(Action<DatabaseOptions>? config = null)
+    public static DatabaseOptions CreateDatabaseOptions(
+        ITestOutputHelper output,
+        Action<DatabaseOptions>? config = null
+    )
     {
-        var options = new DatabaseOptions();
+        var options = new DatabaseOptions
+        {
+            Logger = new TestDatabaseLogger(output)
+        };
         config?.Invoke(options);
         return options;
     }
-
-    public static DatabaseLogger CreateDatabaseLogger(ITestOutputHelper output) => new TestDatabaseLogger(output);
 
     public static Database CreateTestDatabase(
         ITestOutputHelper output,
@@ -19,9 +23,8 @@ public static class CoreHelpers
         Action<DatabaseOptions>? config = null
     )
     {
-        var options = CreateDatabaseOptions(config);
-        var logger = CreateDatabaseLogger(output);
-        return new Database(logger, options, () => dbConnectionFactory());
+        var options = CreateDatabaseOptions(output, config);
+        return new Database(options, () => dbConnectionFactory());
     }
 
     public static Database CreateTestDatabase<TName>(
@@ -30,9 +33,8 @@ public static class CoreHelpers
         Action<DatabaseOptions>? config = null
     ) where TName : IDatabaseName
     {
-        var options = CreateDatabaseOptions(config);
-        var logger = CreateDatabaseLogger(output);
-        return new Database<TName>(logger, options, () => dbConnectionFactory());
+        var options = CreateDatabaseOptions(output, config);
+        return new Database<TName>(options, () => dbConnectionFactory());
     }
 
     public static async Task CreateTestTableRowAsync(

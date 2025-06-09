@@ -3,11 +3,11 @@
 /// <summary>
 /// Represents a database transaction.
 /// </summary>
-/// <param name="logger">The database logger.</param>
+/// <param name="options">The database options.</param>
 /// <param name="transaction">The database transaction.</param>
 /// <param name="onDispose">Callback to be invoked when the transaction is disposed.</param>
 public class DatabaseTransaction(
-    DatabaseLogger logger,
+    DatabaseOptions options,
     DbTransaction transaction,
     Action? onDispose
 ) : IDatabaseTransaction
@@ -67,9 +67,9 @@ public class DatabaseTransaction(
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
 
-        logger.LogDebug<DatabaseTransaction>("Committing the database transaction...");
+        options.Logger.LogDebug<DatabaseTransaction>("Committing the database transaction...");
         await _transaction.CommitAsync(ct);
-        logger.LogInfo<DatabaseTransaction>("Database transaction committed successfully.");
+        options.Logger.LogInfo<DatabaseTransaction>("Database transaction committed successfully.");
     }
 
     /// <inheritdoc />
@@ -78,9 +78,9 @@ public class DatabaseTransaction(
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
 
-        logger.LogDebug<DatabaseTransaction>("Rolling back the database transaction...");
+        options.Logger.LogDebug<DatabaseTransaction>("Rolling back the database transaction...");
         await _transaction.RollbackAsync(ct);
-        logger.LogInfo<DatabaseTransaction>("Database transaction rolled back successfully.");
+        options.Logger.LogInfo<DatabaseTransaction>("Database transaction rolled back successfully.");
     }
 
 #else
@@ -91,9 +91,9 @@ public class DatabaseTransaction(
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
 
-        logger.LogDebug<DatabaseTransaction>("Committing the database transaction...");
+        options.Logger.LogDebug<DatabaseTransaction>("Committing the database transaction...");
         _transaction.Commit();
-        logger.LogInfo<DatabaseTransaction>("Database transaction committed successfully.");
+        options.Logger.LogInfo<DatabaseTransaction>("Database transaction committed successfully.");
 
         return Task.CompletedTask;
     }
@@ -104,9 +104,9 @@ public class DatabaseTransaction(
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
 
-        logger.LogDebug<DatabaseTransaction>("Rolling back the database transaction...");
+        options.Logger.LogDebug<DatabaseTransaction>("Rolling back the database transaction...");
         _transaction.Rollback();
-        logger.LogInfo<DatabaseTransaction>("Database transaction rolled back successfully.");
+        options.Logger.LogInfo<DatabaseTransaction>("Database transaction rolled back successfully.");
 
         return Task.CompletedTask;
     }

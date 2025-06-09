@@ -5,11 +5,9 @@ namespace DapprWire;
 /// <summary>
 /// Represents a database connection.
 /// </summary>
-/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession(
-    DatabaseLogger logger,
     DatabaseOptions options,
     DbConnectionFactory dbConnectionFactory
 ) : IDatabaseSession
@@ -96,7 +94,7 @@ public class DatabaseSession(
         if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
-        logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
+        options.Logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
 #else
@@ -105,9 +103,9 @@ public class DatabaseSession(
 
         _transaction = transaction;
 
-        logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
+        options.Logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
-        return new DatabaseTransaction(logger, transaction, () => { _transaction = null; });
+        return new DatabaseTransaction(options, transaction, () => { _transaction = null; });
     }
 
     /// <inheritdoc />
@@ -182,20 +180,20 @@ public class DatabaseSession(
 
         if (_connection is null)
         {
-            logger.LogDebug<DatabaseSession>("Creating a new database connection...");
+            options.Logger.LogDebug<DatabaseSession>("Creating a new database connection...");
             _connection = dbConnectionFactory();
         }
 
         if (_connection.State is ConnectionState.Open)
             return _connection;
 
-        logger.LogDebug<DatabaseSession>("Opening the database connection...");
+        options.Logger.LogDebug<DatabaseSession>("Opening the database connection...");
         await _connection.OpenAsync(ct).ConfigureAwait(false);
 
         if (options.OnConnectionOpen is not null)
             await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
 
-        logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
+        options.Logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
 
         return _connection;
     }
@@ -225,9 +223,9 @@ public class DatabaseSession(
 
     private void LogCommandDefinition(CommandDefinition command)
     {
-        if (logger.IsEnabled<DatabaseSession>(DatabaseLogLevel.Debug))
+        if (options.Logger.IsEnabled<DatabaseSession>(DatabaseLogLevel.Debug))
         {
-            logger.LogDebug<DatabaseSession>(@"Executing SQL command
+            options.Logger.LogDebug<DatabaseSession>(@"Executing SQL command
 [HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
 {CommandText}",
                 command.Parameters is not null,
@@ -244,12 +242,10 @@ public class DatabaseSession(
 /// Represents a strongly-typed database connection.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
-/// <param name="logger">The database logger.</param>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
 public class DatabaseSession<TName>(
-    DatabaseLogger logger,
     DatabaseOptions options,
     DbConnectionFactory<TName> dbConnectionFactory
-) : DatabaseSession(logger, options, () => dbConnectionFactory()), IDatabaseSession<TName>
+) : DatabaseSession(options, () => dbConnectionFactory()), IDatabaseSession<TName>
     where TName : IDatabaseName;

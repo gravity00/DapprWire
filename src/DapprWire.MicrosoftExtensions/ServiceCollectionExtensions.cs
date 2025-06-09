@@ -31,7 +31,13 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
-        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
+        services.AddSingleton(s =>
+        {
+            var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            if (options.Logger == DatabaseLogger.Null) 
+                options.Logger = s.GetRequiredService<DatabaseLogger>();
+            return options;
+        });
         services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase, Database>();
         services.AddScoped<IDatabaseSession, DatabaseSession>();
@@ -61,7 +67,13 @@ public static class ServiceCollectionExtensions
             services.Configure(config);
 
         services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
-        services.AddSingleton(s => s.GetRequiredService<IOptions<DatabaseOptions>>().Value);
+        services.AddSingleton(s =>
+        {
+            var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            if (options.Logger == DatabaseLogger.Null)
+                options.Logger = s.GetRequiredService<DatabaseLogger>();
+            return options;
+        });
         services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.AddSingleton<IDatabase<TName>, Database<TName>>();
         services.AddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();

@@ -6,20 +6,9 @@ namespace DapprWire.Core.Databases;
 public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     [Fact]
-    public void Constructor_NullDatabaseLogger_Fails()
-    {
-        Assert.Throws<ArgumentNullException>(() => new Database(
-            null!,
-            CoreHelpers.CreateDatabaseOptions(),
-            fixture.GetDbConnection
-        ));
-    }
-
-    [Fact]
     public void Constructor_NullDatabaseOptions_Fails()
     {
         Assert.Throws<ArgumentNullException>(() => new Database(
-            CoreHelpers.CreateDatabaseLogger(output),
             null!,
             fixture.GetDbConnection
         ));
@@ -29,8 +18,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     public void Constructor_NullDbConnectionFactory_Fails()
     {
         Assert.Throws<ArgumentNullException>(() => new Database(
-            CoreHelpers.CreateDatabaseLogger(output),
-            CoreHelpers.CreateDatabaseOptions(),
+            CoreHelpers.CreateDatabaseOptions(output),
             null!
         ));
     }

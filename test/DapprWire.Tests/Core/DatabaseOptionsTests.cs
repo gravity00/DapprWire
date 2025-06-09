@@ -10,31 +10,37 @@ public class DatabaseOptionsTests
     {
         var options = new DatabaseOptions();
 
-        Assert.Equal(IsolationLevel.ReadCommitted, options.DefaultIsolationLevel);
+        Assert.Same(DatabaseLogger.Null, options.Logger);
         Assert.Null(options.OnConnectionOpen);
-        Assert.Null((object?)options.DefaultTimeout);
+        Assert.Null(options.DefaultTimeout);
+        Assert.Equal(IsolationLevel.ReadCommitted, options.DefaultIsolationLevel);
     }
 
     [Fact]
     public void Setters_GettersAreSame()
     {
+        var logger = new DatabaseLogger();
+        var onConnectionOpen = new Func<DbConnection, CancellationToken, Task>((_, _) => Task.CompletedTask);
         const IsolationLevel isolationLevel = IsolationLevel.Serializable;
         const int defaultTimeout = 30;
-        var onConnectionOpen = new Func<DbConnection, CancellationToken, Task>((_, _) => Task.CompletedTask);
 
         var options = new DatabaseOptions
         {
+            Logger = logger,
+            OnConnectionOpen = onConnectionOpen,
             DefaultIsolationLevel = isolationLevel,
             DefaultTimeout = defaultTimeout,
-            OnConnectionOpen = onConnectionOpen,
         };
 
-        Assert.Equal(isolationLevel, options.DefaultIsolationLevel);
-        
+        Assert.NotNull(options.Logger);
+        Assert.Same(logger, options.Logger);
+
         Assert.NotNull(options.OnConnectionOpen);
         Assert.Same(onConnectionOpen, options.OnConnectionOpen);
 
-        Assert.NotNull((object?)options.DefaultTimeout);
+        Assert.NotNull(options.DefaultTimeout);
         Assert.Equal(defaultTimeout, options.DefaultTimeout);
+
+        Assert.Equal(isolationLevel, options.DefaultIsolationLevel);
     }
 }
