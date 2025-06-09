@@ -183,4 +183,118 @@ where
     }
 
     #endregion
+
+    #region SingleOrDefault
+
+    [Fact]
+    public async Task QuerySingleOrDefault_NoParams_ReturnsExpectedResult()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = 2", ct);
+
+        Assert.NotNull(value);
+        Assert.Equal(2, value.Value);
+    }
+
+    [Fact]
+    public async Task QuerySingleOrDefault_WithParams_ReturnsExpectedResult()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = @Value", new
+        {
+            Value = 2
+        }, ct);
+
+        Assert.NotNull(value);
+        Assert.Equal(2, value.Value);
+    }
+
+    [Fact]
+    public async Task QuerySingleOrDefault_NoMatches_ReturnsDefault()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = -1", ct);
+
+        Assert.Null(value);
+    }
+
+    [Fact]
+    public async Task QuerySingleOrDefault_MultipleMatches_Fails()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await session.QuerySingleOrDefaultAsync<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value > 0", ct);
+        });
+    }
+
+    #endregion
 }
