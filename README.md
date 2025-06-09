@@ -1,4 +1,4 @@
-# :pushpin: DapprWire - easy Dapper integration with Microsoft DI
+# :pushpin: DapprWire - Dapper + Microsoft DI made easy
 
 **DapprWire** simplifies the integration of **Dapper** into **Microsoft's Dependency Injection (DI) container**, making database connectivity effortless and efficient. It provides an abstraction layer for **connection and transaction management**, that can be easily injected into your services or repositories, while exposing all Dapper operations so you can use it as your micro-ORM the same way you use **Dapper**.
 
@@ -183,7 +183,7 @@ dotnet build
 
 ## :construction: Test
 
-This library is focused on interacting with SQL databases and unit tests currently require a SQL Server instance to be run.
+This library is focused on interacting with SQL databases and unit tests currently require a running SQL Server instance.
 To make the setup easier, the library [Testcontainers](https://testcontainers.com/) is used so you only need Docker running on your local machine and everything should run as expected.
 
 ```sh
@@ -193,3 +193,5 @@ dotnet test
 ```
 
 Keep in mind the first execution may take some time because images may need to be automatically downloaded first.
+
+If you prefer to use another database, either using Testcontainers or not, simply open the [DatabaseFixture.cs](https://github.com/gravity00/DapprWire/blob/main/test/DapprWire.Tests/DatabaseFixture.cs) file and change to your needs.
