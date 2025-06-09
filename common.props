@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageTags>database;orm;</PackageTags>
+    <PackageTags>database;orm;sql;</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/gravity00/DapprWire</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -36,7 +36,7 @@
   <PropertyGroup>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0.25160</FileVersion>
-    <VersionPrefix>1.0.0-rc01</VersionPrefix>
+    <VersionPrefix>1.0.0-rc02</VersionPrefix>
   </PropertyGroup>
 
 </Project>
