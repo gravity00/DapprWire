@@ -1,4 +1,5 @@
-﻿namespace DapprWire.Core.DatabaseSessions;
+﻿// ReSharper disable UseRawString
+namespace DapprWire.Core.DatabaseSessions;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseSessionQueryTests(DatabaseFixture fixture, ITestOutputHelper output)
@@ -12,8 +13,8 @@ public class DatabaseSessionQueryTests(DatabaseFixture fixture, ITestOutputHelpe
 
         await using var session = await database.ConnectAsync(ct);
 
-        var entries = await session.QueryAsync<int>(@"
-with TestDataCte as (
+        var entries = await session.QueryAsync<int>(@"with
+TestDataCte as (
     select null as Value union all
     select 1 union all 
     select 2 union all
@@ -42,8 +43,8 @@ where
 
         await using var session = await database.ConnectAsync(ct);
 
-        var entries = await session.QueryAsync<int>(@"
-with TestDataCte as (
+        var entries = await session.QueryAsync<int>(@"with
+TestDataCte as (
     select null as Value union all
     select 1 Value union all 
     select 2 union all
