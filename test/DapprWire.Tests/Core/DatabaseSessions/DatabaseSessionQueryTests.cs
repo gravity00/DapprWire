@@ -4,7 +4,7 @@
 public class DatabaseSessionQueryTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     [Fact]
-    public async Task QueryAsync_ReturnsExpectedResults()
+    public async Task Query_NoParams_ReturnsExpectedResults()
     {
         var ct = CancellationToken.None;
 
@@ -12,22 +12,55 @@ public class DatabaseSessionQueryTests(DatabaseFixture fixture, ITestOutputHelpe
 
         await using var session = await database.ConnectAsync(ct);
 
-        var entries = AsReadOnlyCollection(await session.QueryAsync<int>(@"
-select 1 union all 
-select 2 union all
-select 3", ct));
+        var entries = await session.QueryAsync<int>(@"
+with TestDataCte as (
+    select null as Value union all
+    select 1 union all 
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value is not null", ct);
 
-        Assert.NotNull(entries);
-        Assert.NotEmpty(entries);
-        Assert.Equal(3, entries.Count);
         Assert.Collection(entries,
             e => Assert.Equal(1, e),
             e => Assert.Equal(2, e),
-            e => Assert.Equal(3, e)
+            e => Assert.Equal(3, e),
+            e => Assert.Equal(4, e)
         );
     }
 
-    private static IReadOnlyCollection<T>? AsReadOnlyCollection<T>(
-        IEnumerable<T>? items
-    ) => items?.ToArray();
+    [Fact]
+    public async Task Query_WithParams_ReturnsExpectedResults()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var entries = await session.QueryAsync<int>(@"
+with TestDataCte as (
+    select null as Value union all
+    select 1 Value union all 
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value in @Values", new
+        {
+            Values = (int[]) [2, 4]
+        }, ct);
+
+        Assert.Collection(entries,
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(4, e)
+        );
+    }
 }
