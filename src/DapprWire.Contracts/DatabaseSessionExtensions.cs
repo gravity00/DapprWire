@@ -234,6 +234,49 @@ public static class DatabaseSessionExtensions
         }, ct);
     }
 
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Task<T?> QueryFirstOrDefaultAsync<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryFirstOrDefaultAsync<T>(sql, SqlOptions.None, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static Task<T?> QueryFirstOrDefaultAsync<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryFirstOrDefaultAsync<T>(sql, new SqlOptions
+        {
+            Parameters = parameters
+        }, ct);
+    }
+
     private static void EnsureNotNull(IDatabaseSession databaseSession)
     {
         if (databaseSession is null)

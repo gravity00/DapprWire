@@ -89,6 +89,20 @@ public interface IDatabaseSession : IDisposable
         SqlOptions sqlOptions,
         CancellationToken ct
     );
+
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    Task<T?> QueryFirstOrDefaultAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    );
 }
 
 /// <summary>
