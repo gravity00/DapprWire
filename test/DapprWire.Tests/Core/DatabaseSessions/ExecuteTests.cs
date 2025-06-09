@@ -45,4 +45,48 @@ values (@ExternalId, @Name)", new
     }
 
     #endregion
+
+    #region ExecuteScalar
+
+    [Fact]
+    public async Task ExecuteScalar_NoParams_ShouldCreateRows()
+    {
+        var ct = CancellationToken.None;
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var result = await session.ExecuteScalarAsync<int>($@"
+insert into TestTable (ExternalId, Name)
+values ('{externalId}', 'Test {externalId}');
+select cast(SCOPE_IDENTITY() as int);", ct);
+
+        Assert.True(result > 0, "result > 0");
+    }
+
+    [Fact]
+    public async Task ExecuteScalar_WithParams_ShouldCreateRows()
+    {
+        var ct = CancellationToken.None;
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var result = await session.ExecuteScalarAsync<int>(@"
+insert into TestTable (ExternalId, Name)
+values (@ExternalId, @Name);
+select cast(SCOPE_IDENTITY() as int);", new
+        {
+            ExternalId = externalId,
+            Name = $"Test {externalId}"
+        }, ct);
+
+        Assert.True(result > 0, "result > 0");
+    }
+
+    #endregion
 }
