@@ -36,7 +36,7 @@ public static class DatabaseSessionExtensions
     )
     {
         EnsureNotNull(databaseSession);
-        return databaseSession.ExecuteAsync(sql, default, ct);
+        return databaseSession.ExecuteAsync(sql, SqlOptions.None, ct);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public static class DatabaseSessionExtensions
     )
     {
         EnsureNotNull(databaseSession);
-        return databaseSession.QueryAsync<T>(sql, default, ct);
+        return databaseSession.QueryAsync<T>(sql, SqlOptions.None, ct);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public static class DatabaseSessionExtensions
     )
     {
         EnsureNotNull(databaseSession);
-        return databaseSession.QuerySingleAsync<T>(sql, default, ct);
+        return databaseSession.QuerySingleAsync<T>(sql, SqlOptions.None, ct);
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ public static class DatabaseSessionExtensions
     )
     {
         EnsureNotNull(databaseSession);
-        return databaseSession.QuerySingleOrDefaultAsync<T>(sql, default, ct);
+        return databaseSession.QuerySingleOrDefaultAsync<T>(sql, SqlOptions.None, ct);
     }
 
     /// <summary>
@@ -207,7 +207,7 @@ public static class DatabaseSessionExtensions
     )
     {
         EnsureNotNull(databaseSession);
-        return databaseSession.QueryFirstAsync<T>(sql, default, ct);
+        return databaseSession.QueryFirstAsync<T>(sql, SqlOptions.None, ct);
     }
 
     /// <summary>

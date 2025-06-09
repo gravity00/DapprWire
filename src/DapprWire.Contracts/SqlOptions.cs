@@ -8,6 +8,15 @@ namespace DapprWire;
 public readonly record struct SqlOptions
 {
     /// <summary>
+    /// Returns an empty <see cref="SqlOptions"/> value, which can be used when no options are needed.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="SqlOptions"/> returned by this property is equivalent to use the `default` keyword,
+    /// where no parameters, timeout, or command type are specified.
+    /// </remarks>
+    public static SqlOptions None => new();
+
+    /// <summary>
     /// The SQL command parameters.
     /// </summary>
     public object? Parameters { get; init; }
