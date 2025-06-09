@@ -297,4 +297,90 @@ where
     }
 
     #endregion
+
+    #region First
+
+    [Fact]
+    public async Task QueryFirst_MultipleMatches_NoParams_ReturnsExpectedResult()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var value = await session.QueryFirstAsync<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value >= 2", ct);
+
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QueryFirst_MultipleMatches_WithParams_ReturnsExpectedResult()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var value = await session.QueryFirstAsync<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value >= @Value", new
+        {
+            Value = 2
+        }, ct);
+
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QueryFirst_NoMatches_Fails()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await session.QueryFirstAsync<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = -1", ct);
+        });
+    }
+
+    #endregion
 }
