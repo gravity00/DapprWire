@@ -188,6 +188,22 @@ public class DatabaseSession(
         return await connection.QueryFirstAsync<T>(command).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    public async Task<T?> QueryFirstOrDefaultAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.QueryFirstOrDefaultAsync<T>(command).ConfigureAwait(false);
+    }
+
     /// <summary>
     /// Connects to the database asynchronously.
     /// </summary>
