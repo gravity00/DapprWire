@@ -2,6 +2,8 @@
 
 **DapprWire** simplifies the integration of **Dapper** into **Microsoft's Dependency Injection (DI) container**, making database connectivity effortless and efficient. It provides an abstraction layer for **connection and transaction management**, that can be easily injected into your services or repositories, while exposing all Dapper operations so you can use it as your micro-ORM the same way you use **Dapper**.
 
+If you're tired of manually wiring `IDbConnection` into Microsoft DI, reminding yourself to pass `IDbTransaction` as an argument, or simply have some logs to help analyzing production problems, **DapprWire** provides a clean and simple solution for that.
+
 ## :briefcase: Packages
 
 | Package | NuGet | Downloads |
@@ -169,3 +171,25 @@ builder.Services.AddDatabase(_ => new SqlConnection(connectionString), options =
 });
 ```
 
+## :hammer: Build
+
+You should be able to easily build this solution as long you have installed both SDKs for .NET 8.0 and .NET Framework 4.6.1, but more recent versions should also work.
+
+```sh
+git clone https://github.com/gravity00/DapprWire.git DapprWire
+cd .\DapprWire
+dotnet build
+```
+
+## :construction: Test
+
+This library is focused on interacting with SQL databases and unit tests currently require a SQL Server instance to be run.
+To make the setup easier, the library [Testcontainers](https://testcontainers.com/) is used so you only need Docker running on your local machine and everything should run as expected.
+
+```sh
+git clone https://github.com/gravity00/DapprWire.git DapprWire
+cd .\DapprWire
+dotnet test
+```
+
+Keep in mind the first execution may take some time because images may need to be automatically downloaded first.
