@@ -25,10 +25,10 @@
   <PropertyGroup>
     <PackageTags>database;orm;</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/gravity00/DapperWire</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/gravity00/DapprWire</PackageProjectUrl>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/gravity00/DapperWire.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/gravity00/DapprWire.git</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
