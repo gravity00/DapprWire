@@ -30,17 +30,17 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
-        services.AddSingleton(s =>
+        services.TryAddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
+        services.TryAddSingleton(s =>
         {
             var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             if (options.Logger == DatabaseLogger.Null) 
                 options.Logger = s.GetRequiredService<DatabaseLogger>();
             return options;
         });
-        services.AddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabase, Database>();
-        services.AddScoped<IDatabaseSession, DatabaseSession>();
+        services.TryAddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
+        services.TryAddSingleton<IDatabase, Database>();
+        services.TryAddScoped<IDatabaseSession, DatabaseSession>();
 
         return services;
     }
@@ -66,17 +66,17 @@ public static class ServiceCollectionExtensions
         if (config is not null)
             services.Configure(config);
 
-        services.AddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
-        services.AddSingleton(s =>
+        services.TryAddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
+        services.TryAddSingleton(s =>
         {
             var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             if (options.Logger == DatabaseLogger.Null)
                 options.Logger = s.GetRequiredService<DatabaseLogger>();
             return options;
         });
-        services.AddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
-        services.AddSingleton<IDatabase<TName>, Database<TName>>();
-        services.AddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
+        services.TryAddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
+        services.TryAddSingleton<IDatabase<TName>, Database<TName>>();
+        services.TryAddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
 
         return services;
     }
@@ -99,9 +99,59 @@ public static class ServiceCollectionExtensions
     {
         services.AddDatabase<TName>(connectionFactory, config);
 
-        services.AddSingleton<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
-        services.AddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
+        services.TryAddSingleton<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
+        services.TryAddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
 
         return services;
+    }
+
+    private static void TryAddSingleton<TService, TImplementation>(
+        this IServiceCollection services
+    ) where TService : class where TImplementation : class, TService
+    {
+        if (services.All(s => s.ServiceType != typeof(TService))) 
+            services.AddSingleton<TService, TImplementation>();
+    }
+
+    private static void TryAddSingleton<TService, TImplementation>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TImplementation> implementationFactory
+    ) where TService : class where TImplementation : class, TService
+    {
+        if (services.All(s => s.ServiceType != typeof(TService))) 
+            services.AddSingleton<TService>(implementationFactory);
+    }
+
+    private static void TryAddSingleton<TService>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TService> implementationFactory
+    ) where TService : class
+    {
+        services.TryAddSingleton<TService, TService>(implementationFactory);
+    }
+
+    private static void TryAddScoped<TService, TImplementation>(
+        this IServiceCollection services
+    ) where TService : class where TImplementation : class, TService
+    {
+        if (services.All(s => s.ServiceType != typeof(TService)))
+            services.AddScoped<TService, TImplementation>();
+    }
+
+    private static void TryAddScoped<TService, TImplementation>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TImplementation> implementationFactory
+    ) where TService : class where TImplementation : class, TService
+    {
+        if (services.All(s => s.ServiceType != typeof(TService)))
+            services.AddScoped<TService>(implementationFactory);
+    }
+
+    private static void TryAddScoped<TService>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TService> implementationFactory
+    ) where TService : class
+    {
+        services.TryAddScoped<TService, TService>(implementationFactory);
     }
 }
