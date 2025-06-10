@@ -1,4 +1,7 @@
-﻿namespace DapprWire;
+﻿using System.Data.Common;
+using System.Security.Cryptography;
+
+namespace DapprWire;
 
 /// <summary>
 /// Provides extension methods for <see cref="IDatabaseSession"/> instances.
@@ -100,6 +103,45 @@ public static class DatabaseSessionExtensions
     {
         EnsureNotNull(databaseSession);
         return databaseSession.ExecuteScalarAsync<T>(sql, new SqlOptions
+        {
+            Parameters = parameters
+        }, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    public static Task<DbDataReader> ExecuteReaderAsync(
+        this IDatabaseSession databaseSession,
+        string sql,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteReaderAsync(sql, SqlOptions.None, ct);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    public static Task<DbDataReader> ExecuteReaderAsync(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters,
+        CancellationToken ct
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteReaderAsync(sql, new SqlOptions
         {
             Parameters = parameters
         }, ct);

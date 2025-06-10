@@ -125,6 +125,22 @@ public class DatabaseSession(
     }
 
     /// <inheritdoc />
+    public async Task<DbDataReader> ExecuteReaderAsync(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.ExecuteReaderAsync(command).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     public async Task<T?> ExecuteScalarAsync<T>(
         string sql,
         SqlOptions sqlOptions,
