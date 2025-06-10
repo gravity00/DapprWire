@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 
 namespace DapprWire;
 
@@ -43,6 +44,19 @@ public interface IDatabaseSession : IDisposable
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result</returns>
     Task<T?> ExecuteScalarAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    );
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    Task<DbDataReader> ExecuteReaderAsync(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
