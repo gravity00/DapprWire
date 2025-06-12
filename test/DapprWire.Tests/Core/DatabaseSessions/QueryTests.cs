@@ -50,7 +50,7 @@ where
 TestDataCte as (
     select null as Value union all
 
-    select 1 Value union all
+    select 1 union all
     select 2 union all
     select 3 union all
     select 4
@@ -467,6 +467,85 @@ where
     Value = -1", ct);
 
         Assert.Null(value);
+    }
+
+    #endregion
+
+    #region QueryMultiple
+
+    [Fact]
+    public async Task QueryMultiple_NoParams_ReturnsExpectedResults()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        await using var gridReader = await session.QueryMultipleAsync(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value is not null;
+
+select -1;", ct);
+
+        var firstResults = await gridReader.ReadAsync<int>();
+        Assert.Collection(firstResults,
+            e => Assert.Equal(1, e),
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(3, e),
+            e => Assert.Equal(4, e)
+        );
+
+        var secondResult = await gridReader.ReadSingleAsync<int>();
+        Assert.Equal(-1, secondResult);
+    }
+
+    [Fact]
+    public async Task QueryMultiple_WithParams_ReturnsExpectedResults()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        await using var gridReader = await session.QueryMultipleAsync(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value in @Values;
+
+select -1;", new
+        {
+            Values = (int[])[2, 4]
+        }, ct);
+
+        var firstResults = await gridReader.ReadAsync<int>();
+        Assert.Collection(firstResults,
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(4, e)
+        );
+
+        var secondResult = await gridReader.ReadSingleAsync<int>();
+        Assert.Equal(-1, secondResult);
     }
 
     #endregion
