@@ -34,11 +34,11 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(s =>
         {
             var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            if (options.Logger == DatabaseLogger.Null) 
+            if (ReferenceEquals(options.Logger, DatabaseLogger.Null))
                 options.Logger = s.GetRequiredService<DatabaseLogger>();
             return options;
         });
-        services.TryAddSingleton<DbConnectionFactory>(s => () => connectionFactory(s));
+        services.TryAddTransient<DbConnectionFactory>(s => () => connectionFactory(s));
         services.TryAddSingleton<IDatabase, Database>();
         services.TryAddScoped<IDatabaseSession, DatabaseSession>();
 
@@ -70,11 +70,11 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(s =>
         {
             var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            if (options.Logger == DatabaseLogger.Null)
+            if (ReferenceEquals(options.Logger, DatabaseLogger.Null))
                 options.Logger = s.GetRequiredService<DatabaseLogger>();
             return options;
         });
-        services.TryAddSingleton<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
+        services.TryAddTransient<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.TryAddSingleton<IDatabase<TName>, Database<TName>>();
         services.TryAddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
 
@@ -109,7 +109,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services
     ) where TService : class where TImplementation : class, TService
     {
-        if (services.All(s => s.ServiceType != typeof(TService))) 
+        if (services.All(s => s.ServiceType != typeof(TService)))
             services.AddSingleton<TService, TImplementation>();
     }
 
@@ -118,7 +118,7 @@ public static class ServiceCollectionExtensions
         Func<IServiceProvider, TImplementation> implementationFactory
     ) where TService : class where TImplementation : class, TService
     {
-        if (services.All(s => s.ServiceType != typeof(TService))) 
+        if (services.All(s => s.ServiceType != typeof(TService)))
             services.AddSingleton<TService>(implementationFactory);
     }
 
@@ -153,5 +153,22 @@ public static class ServiceCollectionExtensions
     ) where TService : class
     {
         services.TryAddScoped<TService, TService>(implementationFactory);
+    }
+
+    private static void TryAddTransient<TService, TImplementation>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TImplementation> implementationFactory
+    ) where TService : class where TImplementation : class, TService
+    {
+        if (services.All(s => s.ServiceType != typeof(TService)))
+            services.AddTransient<TService>(implementationFactory);
+    }
+
+    private static void TryAddTransient<TService>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TService> implementationFactory
+    ) where TService : class
+    {
+        services.TryAddTransient<TService, TService>(implementationFactory);
     }
 }
