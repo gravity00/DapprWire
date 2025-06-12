@@ -236,6 +236,23 @@ public class DatabaseSession(
         return await connection.QueryFirstOrDefaultAsync<T>(command).ConfigureAwait(false);
     }
 
+    /// <inheritdoc />
+    public async Task<IDatabaseGridReader> QueryMultipleAsync(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        var gridReader = await connection.QueryMultipleAsync(command).ConfigureAwait(false);
+        return new DatabaseGridReader(gridReader);
+    }
+
     /// <summary>
     /// Connects to the database asynchronously.
     /// </summary>
@@ -254,7 +271,11 @@ public class DatabaseSession(
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+    protected async ValueTask<DbConnection> GetDbConnectionAsync(CancellationToken ct)
+#else
     protected async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
+#endif
     {
         EnsureNotDisposed();
 
