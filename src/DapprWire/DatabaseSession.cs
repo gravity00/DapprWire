@@ -254,22 +254,31 @@ public class DatabaseSession(
     }
 
     /// <summary>
-    /// Connects to the database asynchronously.
+    /// Connects to the database.
     /// </summary>
     /// <remarks>
     /// If the connection is already open, this method does nothing.
     /// </remarks>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
+    /// <returns>A task to be awaited for the connection to be open.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
     public async Task ConnectAsync(CancellationToken ct) =>
         await GetDbConnectionAsync(ct).ConfigureAwait(false);
 
     /// <summary>
+    /// Connects to the database.
+    /// </summary>
+    /// <remarks>
+    /// If the connection is already open, this method does nothing.
+    /// </remarks>
+    /// <exception cref="ObjectDisposedException"></exception>
+    public void Connect() => GetDbConnection();
+
+    /// <summary>
     /// Ensures the database connection is initialized and opens it if necessary.
     /// </summary>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
+    /// <returns>A task to be awaited for the database connection.</returns>
     /// <exception cref="ObjectDisposedException"></exception>
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
     protected async ValueTask<DbConnection> GetDbConnectionAsync(CancellationToken ct)
@@ -293,6 +302,37 @@ public class DatabaseSession(
 
         if (options.OnConnectionOpen is not null)
             await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
+
+        options.Logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
+
+        return _connection;
+    }
+
+    /// <summary>
+    /// Ensures the database connection is initialized and opens it if necessary.
+    /// </summary>
+    /// <returns>The database connection.</returns>
+    /// <exception cref="ObjectDisposedException"></exception>
+    protected DbConnection GetDbConnection()
+    {
+        EnsureNotDisposed();
+
+        if (_connection is null)
+        {
+            options.Logger.LogDebug<DatabaseSession>("Creating a new database connection...");
+            _connection = dbConnectionFactory();
+        }
+
+        if (_connection.State is ConnectionState.Open)
+            return _connection;
+
+        options.Logger.LogDebug<DatabaseSession>("Opening the database connection...");
+        _connection.Open();
+
+        options.OnConnectionOpen?.Invoke(_connection, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
 
         options.Logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
 

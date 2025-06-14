@@ -24,7 +24,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task Connect_Succeed()
+    public async Task ConnectAsync_Succeed()
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
@@ -35,7 +35,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task Options_OnConnectionOpen_Invoked()
+    public async Task Options_OnConnectionOpenAsync_Invoked()
     {
         var onConnectionOpenInvoked = false;
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection, options =>
@@ -51,6 +51,38 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         });
 
         await using var session = await database.ConnectAsync(CancellationToken.None);
+
+        Assert.True(onConnectionOpenInvoked);
+    }
+
+    [Fact]
+    public void Connect_Succeed()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        Assert.NotNull(session);
+        Assert.IsType<DatabaseSession>(session);
+    }
+
+    [Fact]
+    public void Options_OnConnectionOpen_Invoked()
+    {
+        var onConnectionOpenInvoked = false;
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection, options =>
+        {
+            options.OnConnectionOpen = (dbConnection, _) =>
+            {
+                Assert.NotNull(dbConnection);
+                Assert.Equal(ConnectionState.Open, dbConnection.State);
+
+                onConnectionOpenInvoked = true;
+                return Task.CompletedTask;
+            };
+        });
+
+        using var session = database.Connect();
 
         Assert.True(onConnectionOpenInvoked);
     }
