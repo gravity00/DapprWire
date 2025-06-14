@@ -38,6 +38,27 @@ public class Database(
 
         return database;
     }
+
+    /// <inheritdoc />
+    public IDatabaseSession Connect()
+    {
+        options.Logger.LogDebug<Database>("Starting a new database session...");
+        var database = new DatabaseSession(_options, _dbConnectionFactory);
+
+        try
+        {
+            database.Connect();
+        }
+        catch
+        {
+            database.Dispose();
+            throw;
+        }
+
+        options.Logger.LogInfo<Database>("Database session started successfully.");
+
+        return database;
+    }
 }
 
 /// <summary>
