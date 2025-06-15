@@ -105,7 +105,38 @@ public class DatabaseSession(
 
         options.Logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
 
-        return new DatabaseTransaction(options, transaction, () => { _transaction = null; });
+        return new DatabaseTransaction(options, transaction, () =>
+        {
+            _transaction = null;
+        });
+    }
+
+    /// <inheritdoc />
+    public IDatabaseTransaction BeginTransaction(
+        IsolationLevel isolationLevel
+    )
+    {
+        EnsureNotDisposed();
+
+        if (_transaction is not null)
+            throw new InvalidOperationException("A transaction is already in progress.");
+
+        var connection = GetDbConnection();
+
+        if (isolationLevel == default)
+            isolationLevel = options.DefaultIsolationLevel;
+
+        options.Logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
+        var transaction = connection.BeginTransaction(isolationLevel);
+
+        _transaction = transaction;
+
+        options.Logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
+
+        return new DatabaseTransaction(options, transaction, () =>
+        {
+            _transaction = null;
+        });
     }
 
     /// <inheritdoc />

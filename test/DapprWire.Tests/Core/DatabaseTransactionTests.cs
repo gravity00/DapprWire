@@ -4,7 +4,7 @@
 public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     [Fact]
-    public async Task BeginTransaction_Succeed()
+    public async Task BeginTransactionAsync_Succeed()
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
@@ -17,7 +17,20 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     }
 
     [Fact]
-    public async Task BeginTransaction_AlreadyOpen_Fail()
+    public void BeginTransaction_Succeed()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        using var transaction = session.BeginTransaction();
+
+        Assert.NotNull(transaction);
+        Assert.IsType<DatabaseTransaction>(transaction);
+    }
+
+    [Fact]
+    public async Task BeginTransactionAsync_AlreadyOpen_Fail()
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
@@ -28,6 +41,21 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             await session.BeginTransactionAsync(CancellationToken.None);
+        });
+    }
+
+    [Fact]
+    public void BeginTransaction_AlreadyOpen_Fail()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        using var transaction = session.BeginTransaction();
+
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            session.BeginTransaction();
         });
     }
 
