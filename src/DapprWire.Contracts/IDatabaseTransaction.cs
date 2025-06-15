@@ -16,9 +16,19 @@ public interface IDatabaseTransaction : IDisposable
     Task CommitAsync(CancellationToken ct);
 
     /// <summary>
+    /// Commits the transaction.
+    /// </summary>
+    void Commit();
+
+    /// <summary>
     /// Rolls back the transaction.
     /// </summary>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the result.</returns>
     Task RollbackAsync(CancellationToken ct);
+
+    /// <summary>
+    /// Rolls back the transaction.
+    /// </summary>
+    void Rollback();
 }
