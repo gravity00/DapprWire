@@ -14,6 +14,9 @@ public class DatabaseGridReader(
 
     #region Disposables
 
+    /// <summary>
+    /// Finalizes the database grid reader.
+    /// </summary>
     ~DatabaseGridReader() => Dispose(false);
 
     /// <inheritdoc />
