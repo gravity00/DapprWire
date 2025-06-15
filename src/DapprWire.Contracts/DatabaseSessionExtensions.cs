@@ -123,6 +123,8 @@ public static class DatabaseSessionExtensions
 
     #endregion
 
+    #region ExecuteScalar
+
     /// <summary>
     /// Executes a SQL command with the specified parameters and options,
     /// that returns a single result of type T.
@@ -130,7 +132,7 @@ public static class DatabaseSessionExtensions
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the query result.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<T?> ExecuteScalarAsync<T>(
         this IDatabaseSession databaseSession,
@@ -148,9 +150,26 @@ public static class DatabaseSessionExtensions
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
+    /// <returns>The query result.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static T? ExecuteScalar<T>(
+        this IDatabaseSession databaseSession,
+        string sql
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteScalar<T>(sql, SqlOptions.None);
+    }
+
+    /// <summary>
+    /// Executes a SQL command with the specified parameters and options,
+    /// that returns a single result of type T.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>The query result.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<T?> ExecuteScalarAsync<T>(
         this IDatabaseSession databaseSession,
@@ -165,6 +184,30 @@ public static class DatabaseSessionExtensions
             Parameters = parameters
         }, ct);
     }
+
+    /// <summary>
+    /// Executes a SQL command with the specified parameters and options,
+    /// that returns a single result of type T.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <returns>The query result.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static T? ExecuteScalar<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteScalar<T>(sql, new SqlOptions
+        {
+            Parameters = parameters
+        });
+    }
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns a data reader for the results.

@@ -203,6 +203,21 @@ public class DatabaseSession(
     }
 
     /// <inheritdoc />
+    public T? ExecuteScalar<T>(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.ExecuteScalar<T>(command);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<T>> QueryAsync<T>(
         string sql,
         SqlOptions sqlOptions,
