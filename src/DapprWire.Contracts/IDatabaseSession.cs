@@ -37,11 +37,22 @@ public interface IDatabaseSession : IDisposable
     /// <param name="sql">The SQL command.</param>
     /// <param name="sqlOptions">The SQL options.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the number of rows affected.</returns>
     Task<int> ExecuteAsync(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
+    );
+
+    /// <summary>
+    /// Executes a SQL command with the specified options.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <returns>The number of rows affected.</returns>
+    int Execute(
+        string sql,
+        SqlOptions sqlOptions
     );
 
     /// <summary>

@@ -156,6 +156,21 @@ public class DatabaseSession(
     }
 
     /// <inheritdoc />
+    public int Execute(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.Execute(command);
+    }
+
+    /// <inheritdoc />
     public async Task<DbDataReader> ExecuteReaderAsync(
         string sql,
         SqlOptions sqlOptions,

@@ -7,6 +7,8 @@ namespace DapprWire;
 /// </summary>
 public static class DatabaseSessionExtensions
 {
+    #region BeginTransaction
+
     /// <summary>
     /// Starts a new database transaction.
     /// </summary>
@@ -37,13 +39,17 @@ public static class DatabaseSessionExtensions
         return databaseSession.BeginTransaction(default);
     }
 
+    #endregion
+
+    #region Execute
+
     /// <summary>
     /// Executes a SQL command with the specified options.
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the number of rows affected.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<int> ExecuteAsync(
         this IDatabaseSession databaseSession,
@@ -60,9 +66,25 @@ public static class DatabaseSessionExtensions
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
+    /// <returns>The number of rows affected.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static int Execute(
+        this IDatabaseSession databaseSession,
+        string sql
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.Execute(sql, SqlOptions.None);
+    }
+
+    /// <summary>
+    /// Executes a SQL command with the specified options.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the number of rows affected.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<int> ExecuteAsync(
         this IDatabaseSession databaseSession,
@@ -77,6 +99,29 @@ public static class DatabaseSessionExtensions
             Parameters = parameters
         }, ct);
     }
+
+    /// <summary>
+    /// Executes a SQL command with the specified options.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <returns>The number of rows affected.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static int Execute(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.Execute(sql, new SqlOptions
+        {
+            Parameters = parameters
+        });
+    }
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command with the specified parameters and options,
