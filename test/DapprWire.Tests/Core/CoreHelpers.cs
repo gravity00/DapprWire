@@ -61,6 +61,28 @@ values (
 )", parameters, ct);
     }
 
+    public static void CreateTestTableRow(
+        this IDatabaseSession session,
+        Guid externalId,
+        string name
+    )
+    {
+        var parameters = new
+        {
+            ExternalId = externalId,
+            Name = name
+        };
+        session.Execute(@"
+insert into TestTable (
+    ExternalId,
+    Name
+)
+values (
+    @ExternalId,
+    @Name
+)", parameters);
+    }
+
     public static async Task<TestTableEntity?> GetTestTableRowByExternalIdAsync(
         this IDatabaseSession session,
         Guid externalId,
@@ -79,6 +101,25 @@ select
 from TestTable
 where
     ExternalId = @ExternalId", parameters, ct);
+    }
+
+    public static TestTableEntity? GetTestTableRowByExternalId(
+        this IDatabaseSession session,
+        Guid externalId
+    )
+    {
+        var parameters = new
+        {
+            ExternalId = externalId
+        };
+        return session.QuerySingleOrDefault<TestTableEntity>(@"
+select
+    Id,
+    ExternalId,
+    Name
+from TestTable
+where
+    ExternalId = @ExternalId", parameters);
     }
 
     private class TestDatabaseLogger(ITestOutputHelper output) : DatabaseLogger

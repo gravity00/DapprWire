@@ -60,7 +60,7 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     }
 
     [Fact]
-    public async Task CommitTransaction_InsertIsKept()
+    public async Task CommitTransactionAsync_InsertIsKept()
     {
         var ct = CancellationToken.None;
         var externalId = Guid.NewGuid();
@@ -86,7 +86,32 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     }
 
     [Fact]
-    public async Task RollbackTransaction_InsertIsReverted()
+    public void CommitTransaction_InsertIsKept()
+    {
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using (var session = database.Connect())
+        {
+            using var transaction = session.BeginTransaction();
+
+            session.CreateTestTableRow(externalId, $"Test '{externalId}'");
+
+            transaction.Commit();
+        }
+
+        using (var session = database.Connect())
+        {
+            var testTableRow = session.GetTestTableRowByExternalId(externalId);
+
+            Assert.NotNull(testTableRow);
+            Assert.Equal(externalId, testTableRow.ExternalId);
+        }
+    }
+
+    [Fact]
+    public async Task RollbackTransactionAsync_InsertIsReverted()
     {
         var ct = CancellationToken.None;
         var externalId = Guid.NewGuid();
@@ -111,7 +136,31 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     }
 
     [Fact]
-    public async Task DisposeTransaction_NoCommit_InsertIsReverted()
+    public void RollbackTransaction_InsertIsReverted()
+    {
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using (var session = database.Connect())
+        {
+            using var transaction = session.BeginTransaction();
+
+            session.CreateTestTableRow(externalId, $"Test '{externalId}'");
+
+            transaction.Rollback();
+        }
+
+        using (var session = database.Connect())
+        {
+            var testTableRow = session.GetTestTableRowByExternalId(externalId);
+            
+            Assert.Null(testTableRow);
+        }
+    }
+
+    [Fact]
+    public async Task DisposeTransactionAsync_NoCommit_InsertIsReverted()
     {
         var ct = CancellationToken.None;
         var externalId = Guid.NewGuid();
@@ -128,6 +177,28 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
         await using (var session = await database.ConnectAsync(ct))
         {
             var testTableRow = await session.GetTestTableRowByExternalIdAsync(externalId, ct);
+            
+            Assert.Null(testTableRow);
+        }
+    }
+
+    [Fact]
+    public void DisposeTransaction_NoCommit_InsertIsReverted()
+    {
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using (var session = database.Connect())
+        {
+            using var transaction = session.BeginTransaction();
+            
+            session.CreateTestTableRow(externalId, $"Test '{externalId}'");
+        }
+
+        using (var session = database.Connect())
+        {
+            var testTableRow = session.GetTestTableRowByExternalId(externalId);
             
             Assert.Null(testTableRow);
         }
