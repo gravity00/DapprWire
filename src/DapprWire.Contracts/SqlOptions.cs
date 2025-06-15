@@ -14,7 +14,7 @@ public readonly record struct SqlOptions
     /// The <see cref="SqlOptions"/> returned by this property is equivalent to use the `default` keyword,
     /// where no parameters, timeout, or command type are specified.
     /// </remarks>
-    public static SqlOptions None => new();
+    public static SqlOptions None { get; } = new();
 
     /// <summary>
     /// The SQL command parameters.
