@@ -12,7 +12,7 @@ public static class DatabaseSessionExtensions
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the transaction when started.</returns>
+    /// <returns>A task to be awaited for the transaction to start.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<IDatabaseTransaction> BeginTransactionAsync(
         this IDatabaseSession databaseSession,
