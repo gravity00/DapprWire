@@ -251,6 +251,21 @@ public class DatabaseSession(
     }
 
     /// <inheritdoc />
+    public T? QuerySingleOrDefault<T>(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.QuerySingleOrDefault<T>(command);
+    }
+
+    /// <inheritdoc />
     public async Task<T> QueryFirstAsync<T>(
         string sql,
         SqlOptions sqlOptions,
