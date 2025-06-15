@@ -85,7 +85,7 @@ values (@ExternalId, @Name)", new
     #region ExecuteScalar
 
     [Fact]
-    public async Task ExecuteScalar_NoParams_ShouldCreateRows()
+    public async Task ExecuteScalarAsync_NoParams_ShouldCreateRows()
     {
         var ct = CancellationToken.None;
         var externalId = Guid.NewGuid();
@@ -103,7 +103,24 @@ select cast(SCOPE_IDENTITY() as int);", ct);
     }
 
     [Fact]
-    public async Task ExecuteScalar_WithParams_ShouldCreateRows()
+    public void ExecuteScalar_NoParams_ShouldCreateRows()
+    {
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var result = session.ExecuteScalar<int>($@"
+insert into TestTable (ExternalId, Name)
+values ('{externalId}', 'Test {externalId}');
+select cast(SCOPE_IDENTITY() as int);");
+
+        Assert.True(result > 0, "result > 0");
+    }
+
+    [Fact]
+    public async Task ExecuteScalarAsync_WithParams_ShouldCreateRows()
     {
         var ct = CancellationToken.None;
         var externalId = Guid.NewGuid();
@@ -120,6 +137,27 @@ select cast(SCOPE_IDENTITY() as int);", new
             ExternalId = externalId,
             Name = $"Test {externalId}"
         }, ct);
+
+        Assert.True(result > 0, "result > 0");
+    }
+
+    [Fact]
+    public void ExecuteScalar_WithParams_ShouldCreateRows()
+    {
+        var externalId = Guid.NewGuid();
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var result = session.ExecuteScalar<int>(@"
+insert into TestTable (ExternalId, Name)
+values (@ExternalId, @Name);
+select cast(SCOPE_IDENTITY() as int);", new
+        {
+            ExternalId = externalId,
+            Name = $"Test {externalId}"
+        });
 
         Assert.True(result > 0, "result > 0");
     }

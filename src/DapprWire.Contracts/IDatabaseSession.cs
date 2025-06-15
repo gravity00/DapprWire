@@ -56,20 +56,6 @@ public interface IDatabaseSession : IDisposable
     );
 
     /// <summary>
-    /// Executes a SQL command with the specified parameters and options,
-    /// that returns a single result of type T.
-    /// </summary>
-    /// <param name="sql">The SQL command.</param>
-    /// <param name="sqlOptions">The SQL options.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
-    Task<T?> ExecuteScalarAsync<T>(
-        string sql,
-        SqlOptions sqlOptions,
-        CancellationToken ct
-    );
-
-    /// <summary>
     /// Executes a SQL command and returns a data reader for the results.
     /// </summary>
     /// <param name="sql">The SQL command.</param>
@@ -80,6 +66,32 @@ public interface IDatabaseSession : IDisposable
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
+    );
+
+    /// <summary>
+    /// Executes a SQL command with the specified parameters and options,
+    /// that returns a single result of type T.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the query results</returns>
+    Task<T?> ExecuteScalarAsync<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    );
+
+    /// <summary>
+    /// Executes a SQL command with the specified parameters and options,
+    /// that returns a single result of type T.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <returns>The query result.</returns>
+    T? ExecuteScalar<T>(
+        string sql,
+        SqlOptions sqlOptions
     );
 
     /// <summary>
