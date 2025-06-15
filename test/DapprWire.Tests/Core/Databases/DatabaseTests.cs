@@ -35,6 +35,17 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     }
 
     [Fact]
+    public void Connect_Succeed()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        Assert.NotNull(session);
+        Assert.IsType<DatabaseSession>(session);
+    }
+
+    [Fact]
     public async Task Options_OnConnectionOpenAsync_Invoked()
     {
         var onConnectionOpenInvoked = false;
@@ -53,17 +64,6 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         await using var session = await database.ConnectAsync(CancellationToken.None);
 
         Assert.True(onConnectionOpenInvoked);
-    }
-
-    [Fact]
-    public void Connect_Succeed()
-    {
-        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
-
-        using var session = database.Connect();
-
-        Assert.NotNull(session);
-        Assert.IsType<DatabaseSession>(session);
     }
 
     [Fact]
