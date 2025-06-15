@@ -88,18 +88,36 @@ public class DatabaseTransaction(
     /// <inheritdoc />
     public Task CommitAsync(CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+
+        Commit();
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public Task RollbackAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        Rollback();
+        return Task.CompletedTask;
+    }
+
+#endif
+
+    /// <inheritdoc />
+    public void Commit()
+    {
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
 
         options.Logger.LogDebug<DatabaseTransaction>("Committing the database transaction...");
         _transaction.Commit();
         options.Logger.LogInfo<DatabaseTransaction>("Database transaction committed successfully.");
-
-        return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public Task RollbackAsync(CancellationToken ct)
+    public void Rollback()
     {
         if (_transaction is null)
             throw new ObjectDisposedException(nameof(DatabaseTransaction));
@@ -107,9 +125,5 @@ public class DatabaseTransaction(
         options.Logger.LogDebug<DatabaseTransaction>("Rolling back the database transaction...");
         _transaction.Rollback();
         options.Logger.LogInfo<DatabaseTransaction>("Database transaction rolled back successfully.");
-
-        return Task.CompletedTask;
     }
-
-#endif
 }

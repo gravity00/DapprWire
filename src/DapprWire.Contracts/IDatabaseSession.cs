@@ -16,10 +16,19 @@ public interface IDatabaseSession : IDisposable
     /// </summary>
     /// <param name="isolationLevel">The transaction isolation level.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result.</returns>
+    /// <returns>A task to be awaited for the transaction when started.</returns>
     Task<IDatabaseTransaction> BeginTransactionAsync(
         IsolationLevel isolationLevel,
         CancellationToken ct
+    );
+
+    /// <summary>
+    /// Starts a new database transaction.
+    /// </summary>
+    /// <param name="isolationLevel">The transaction isolation level.</param>
+    /// <returns>The transaction when started.</returns>
+    IDatabaseTransaction BeginTransaction(
+        IsolationLevel isolationLevel
     );
 
     /// <summary>
