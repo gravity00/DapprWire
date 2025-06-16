@@ -78,6 +78,8 @@ public class DatabaseSession(
 
     #endregion
 
+    #region BeginTransaction
+
     /// <inheritdoc />
     public async Task<IDatabaseTransaction> BeginTransactionAsync(
         IsolationLevel isolationLevel,
@@ -139,6 +141,10 @@ public class DatabaseSession(
         });
     }
 
+    #endregion
+
+    #region Execute
+
     /// <inheritdoc />
     public async Task<int> ExecuteAsync(
         string sql,
@@ -170,6 +176,8 @@ public class DatabaseSession(
         return connection.Execute(command);
     }
 
+    #endregion
+
     /// <inheritdoc />
     public async Task<DbDataReader> ExecuteReaderAsync(
         string sql,
@@ -185,6 +193,8 @@ public class DatabaseSession(
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
         return await connection.ExecuteReaderAsync(command).ConfigureAwait(false);
     }
+
+    #region ExecuteScalar
 
     /// <inheritdoc />
     public async Task<T?> ExecuteScalarAsync<T>(
@@ -216,6 +226,8 @@ public class DatabaseSession(
         var connection = GetDbConnection();
         return connection.ExecuteScalar<T>(command);
     }
+
+    #endregion
 
     /// <inheritdoc />
     public async Task<IEnumerable<T>> QueryAsync<T>(
@@ -249,6 +261,8 @@ public class DatabaseSession(
         return await connection.QuerySingleAsync<T>(command).ConfigureAwait(false);
     }
 
+    #region QuerySingleOrDefault
+
     /// <inheritdoc />
     public async Task<T?> QuerySingleOrDefaultAsync<T>(
         string sql,
@@ -279,6 +293,8 @@ public class DatabaseSession(
         var connection = GetDbConnection();
         return connection.QuerySingleOrDefault<T>(command);
     }
+
+    #endregion
 
     /// <inheritdoc />
     public async Task<T> QueryFirstAsync<T>(

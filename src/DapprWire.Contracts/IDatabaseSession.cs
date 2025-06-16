@@ -11,6 +11,8 @@ public interface IDatabaseSession : IDisposable
     , IAsyncDisposable
 #endif
 {
+    #region BeginTransaction
+
     /// <summary>
     /// Starts a new database transaction.
     /// </summary>
@@ -30,6 +32,10 @@ public interface IDatabaseSession : IDisposable
     IDatabaseTransaction BeginTransaction(
         IsolationLevel isolationLevel
     );
+
+    #endregion
+
+    #region Execute
 
     /// <summary>
     /// Executes a SQL command with the specified options.
@@ -55,18 +61,9 @@ public interface IDatabaseSession : IDisposable
         SqlOptions sqlOptions
     );
 
-    /// <summary>
-    /// Executes a SQL command and returns a data reader for the results.
-    /// </summary>
-    /// <param name="sql">The SQL command.</param>
-    /// <param name="sqlOptions">The SQL options.</param>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
-    Task<DbDataReader> ExecuteReaderAsync(
-        string sql,
-        SqlOptions sqlOptions,
-        CancellationToken ct
-    );
+    #endregion
+
+    #region ExecuteScalar
 
     /// <summary>
     /// Executes a SQL command with the specified parameters and options,
@@ -92,6 +89,21 @@ public interface IDatabaseSession : IDisposable
     T? ExecuteScalar<T>(
         string sql,
         SqlOptions sqlOptions
+    );
+
+    #endregion
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>A task to be awaited for the result</returns>
+    Task<DbDataReader> ExecuteReaderAsync(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
     );
 
     /// <summary>
@@ -122,6 +134,8 @@ public interface IDatabaseSession : IDisposable
         CancellationToken ct
     );
 
+    #region QuerySingleOrDefault
+
     /// <summary>
     /// Executes a SQL command and returns a single result of type T.
     /// </summary>
@@ -147,6 +161,8 @@ public interface IDatabaseSession : IDisposable
         string sql,
         SqlOptions sqlOptions
     );
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns the first result of type T.
