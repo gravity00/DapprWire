@@ -93,18 +93,33 @@ public interface IDatabaseSession : IDisposable
 
     #endregion
 
+    #region ExecuteReader
+
     /// <summary>
     /// Executes a SQL command and returns a data reader for the results.
     /// </summary>
     /// <param name="sql">The SQL command.</param>
     /// <param name="sqlOptions">The SQL options.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the data reader.</returns>
     Task<DbDataReader> ExecuteReaderAsync(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
     );
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <returns>The data reader.</returns>
+    IDataReader ExecuteReader(
+        string sql,
+        SqlOptions sqlOptions
+    );
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns a collection of results of type T.

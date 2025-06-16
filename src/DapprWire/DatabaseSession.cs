@@ -178,22 +178,6 @@ public class DatabaseSession(
 
     #endregion
 
-    /// <inheritdoc />
-    public async Task<DbDataReader> ExecuteReaderAsync(
-        string sql,
-        SqlOptions sqlOptions,
-        CancellationToken ct
-    )
-    {
-        EnsureNotDisposed();
-
-        var command = CreateCommandDefinition(sql, sqlOptions, ct);
-        LogCommandDefinition(command);
-
-        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
-        return await connection.ExecuteReaderAsync(command).ConfigureAwait(false);
-    }
-
     #region ExecuteScalar
 
     /// <inheritdoc />
@@ -225,6 +209,41 @@ public class DatabaseSession(
 
         var connection = GetDbConnection();
         return connection.ExecuteScalar<T>(command);
+    }
+
+    #endregion
+
+    #region ExecuteReader
+
+    /// <inheritdoc />
+    public async Task<DbDataReader> ExecuteReaderAsync(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, ct);
+        LogCommandDefinition(command);
+
+        var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
+        return await connection.ExecuteReaderAsync(command).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public IDataReader ExecuteReader(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.ExecuteReader(command);
     }
 
     #endregion
