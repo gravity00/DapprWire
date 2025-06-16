@@ -423,6 +423,8 @@ public class DatabaseSession(
 
     #endregion
 
+    #region QueryMultiple
+
     /// <inheritdoc />
     public async Task<IDatabaseGridReader> QueryMultipleAsync(
         string sql,
@@ -439,6 +441,24 @@ public class DatabaseSession(
         var gridReader = await connection.QueryMultipleAsync(command).ConfigureAwait(false);
         return new DatabaseGridReader(gridReader);
     }
+
+    /// <inheritdoc />
+    public IDatabaseGridReader QueryMultiple(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        var gridReader = connection.QueryMultiple(command);
+        return new DatabaseGridReader(gridReader);
+    }
+
+    #endregion
 
     /// <summary>
     /// Connects to the database.
