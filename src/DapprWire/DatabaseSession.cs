@@ -283,6 +283,8 @@ public class DatabaseSession(
 
     #endregion
 
+    #region QuerySingle
+
     /// <inheritdoc />
     public async Task<T> QuerySingleAsync<T>(
         string sql,
@@ -298,6 +300,23 @@ public class DatabaseSession(
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
         return await connection.QuerySingleAsync<T>(command).ConfigureAwait(false);
     }
+
+    /// <inheritdoc />
+    public T QuerySingle<T>(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.QuerySingle<T>(command);
+    }
+
+    #endregion
 
     #region QuerySingleOrDefault
 

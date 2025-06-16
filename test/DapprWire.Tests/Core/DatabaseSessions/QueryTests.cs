@@ -133,7 +133,7 @@ where
     #region Single
 
     [Fact]
-    public async Task QuerySingle_NoParams_ReturnsExpectedResult()
+    public async Task QuerySingleAsync_NoParams_ReturnsExpectedResult()
     {
         var ct = CancellationToken.None;
 
@@ -159,7 +159,31 @@ where
     }
 
     [Fact]
-    public async Task QuerySingle_WithParams_ReturnsExpectedResult()
+    public void QuerySingle_NoParams_ReturnsExpectedResult()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var value = session.QuerySingle<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = 2");
+
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QuerySingleAsync_WithParams_ReturnsExpectedResult()
     {
         var ct = CancellationToken.None;
 
@@ -188,7 +212,34 @@ where
     }
 
     [Fact]
-    public async Task QuerySingle_NoMatches_Fails()
+    public void QuerySingle_WithParams_ReturnsExpectedResult()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var value = session.QuerySingle<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = @Value", new
+        {
+            Value = 2
+        });
+
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QuerySingleAsync_NoMatches_Fails()
     {
         var ct = CancellationToken.None;
 
@@ -215,7 +266,32 @@ where
     }
 
     [Fact]
-    public async Task QuerySingle_MultipleMatches_Fails()
+    public void QuerySingle_NoMatches_Fails()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            session.QuerySingle<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = -1");
+        });
+    }
+
+    [Fact]
+    public async Task QuerySingleAsync_MultipleMatches_Fails()
     {
         var ct = CancellationToken.None;
 
@@ -238,6 +314,31 @@ select *
 from TestDataCte
 where
     Value > 0", ct);
+        });
+    }
+
+    [Fact]
+    public void QuerySingle_MultipleMatches_Fails()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            session.QuerySingle<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value > 0");
         });
     }
 
