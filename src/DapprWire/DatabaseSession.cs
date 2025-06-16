@@ -388,6 +388,8 @@ public class DatabaseSession(
 
     #endregion
 
+    #region QueryFirstOrDefault
+
     /// <inheritdoc />
     public async Task<T?> QueryFirstOrDefaultAsync<T>(
         string sql,
@@ -403,6 +405,23 @@ public class DatabaseSession(
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
         return await connection.QueryFirstOrDefaultAsync<T>(command).ConfigureAwait(false);
     }
+
+    /// <inheritdoc />
+    public T? QueryFirstOrDefault<T>(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.QueryFirstOrDefault<T>(command);
+    }
+
+    #endregion
 
     /// <inheritdoc />
     public async Task<IDatabaseGridReader> QueryMultipleAsync(

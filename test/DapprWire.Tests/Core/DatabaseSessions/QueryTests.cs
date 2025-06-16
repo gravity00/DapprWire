@@ -725,7 +725,7 @@ where
     #region FirstOrDefault
 
     [Fact]
-    public async Task QueryFirstOrDefault_MultipleMatches_NoParams_ReturnsExpectedResult()
+    public async Task QueryFirstOrDefaultAsync_MultipleMatches_NoParams_ReturnsExpectedResult()
     {
         var ct = CancellationToken.None;
 
@@ -752,7 +752,32 @@ where
     }
 
     [Fact]
-    public async Task QueryFirstOrDefault_MultipleMatches_WithParams_ReturnsExpectedResult()
+    public void QueryFirstOrDefault_MultipleMatches_NoParams_ReturnsExpectedResult()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var value = session.QueryFirstOrDefault<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value >= 2");
+
+        Assert.NotNull(value);
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QueryFirstOrDefaultAsync_MultipleMatches_WithParams_ReturnsExpectedResult()
     {
         var ct = CancellationToken.None;
 
@@ -782,7 +807,35 @@ where
     }
 
     [Fact]
-    public async Task QueryFirstOrDefault_NoMatches_ReturnsDefault()
+    public void QueryFirstOrDefault_MultipleMatches_WithParams_ReturnsExpectedResult()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var value = session.QueryFirstOrDefault<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value >= @Value", new
+        {
+            Value = 2
+        });
+
+        Assert.NotNull(value);
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public async Task QueryFirstOrDefaultAsync_NoMatches_ReturnsDefault()
     {
         var ct = CancellationToken.None;
 
@@ -803,6 +856,30 @@ select *
 from TestDataCte
 where
     Value = -1", ct);
+
+        Assert.Null(value);
+    }
+
+    [Fact]
+    public void QueryFirstOrDefault_NoMatches_ReturnsDefault()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var value = session.QueryFirstOrDefault<int?>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value = -1");
 
         Assert.Null(value);
     }
