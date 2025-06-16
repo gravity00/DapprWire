@@ -353,6 +353,8 @@ public class DatabaseSession(
 
     #endregion
 
+    #region QueryFirst
+
     /// <inheritdoc />
     public async Task<T> QueryFirstAsync<T>(
         string sql,
@@ -368,6 +370,23 @@ public class DatabaseSession(
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
         return await connection.QueryFirstAsync<T>(command).ConfigureAwait(false);
     }
+
+    /// <inheritdoc />
+    public T QueryFirst<T>(
+        string sql,
+        SqlOptions sqlOptions
+    )
+    {
+        EnsureNotDisposed();
+
+        var command = CreateCommandDefinition(sql, sqlOptions, CancellationToken.None);
+        LogCommandDefinition(command);
+
+        var connection = GetDbConnection();
+        return connection.QueryFirst<T>(command);
+    }
+
+    #endregion
 
     /// <inheritdoc />
     public async Task<T?> QueryFirstOrDefaultAsync<T>(
