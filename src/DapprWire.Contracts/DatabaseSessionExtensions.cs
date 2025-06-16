@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System.Data;
+using System.Data.Common;
 
 namespace DapprWire;
 
@@ -209,13 +210,16 @@ public static class DatabaseSessionExtensions
 
     #endregion
 
+    #region ExecuteReader
+
     /// <summary>
     /// Executes a SQL command and returns a data reader for the results.
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the data reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static Task<DbDataReader> ExecuteReaderAsync(
         this IDatabaseSession databaseSession,
         string sql,
@@ -231,9 +235,26 @@ public static class DatabaseSessionExtensions
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
+    /// <returns>The data reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IDataReader ExecuteReader(
+        this IDatabaseSession databaseSession,
+        string sql
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteReader(sql, SqlOptions.None);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the data reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static Task<DbDataReader> ExecuteReaderAsync(
         this IDatabaseSession databaseSession,
         string sql,
@@ -247,6 +268,29 @@ public static class DatabaseSessionExtensions
             Parameters = parameters
         }, ct);
     }
+
+    /// <summary>
+    /// Executes a SQL command and returns a data reader for the results.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <returns>A task to be awaited for the data reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IDataReader ExecuteReader(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.ExecuteReader(sql, new SqlOptions
+        {
+            Parameters = parameters
+        });
+    }
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns a collection of results of type T.

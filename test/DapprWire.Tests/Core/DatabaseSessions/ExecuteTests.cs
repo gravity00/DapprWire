@@ -167,7 +167,7 @@ select cast(SCOPE_IDENTITY() as int);", new
     #region ExecuteReader
 
     [Fact]
-    public async Task ExecuteReader_NoParams_ReturnsExpectedResults()
+    public async Task ExecuteReaderAsync_NoParams_ReturnsExpectedResults()
     {
         var ct = CancellationToken.None;
 
@@ -204,7 +204,42 @@ where
     }
 
     [Fact]
-    public async Task ExecuteReader_WithParams_ReturnsExpectedResults()
+    public void ExecuteReader_NoParams_ReturnsExpectedResults()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        using var reader = session.ExecuteReader(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value is not null");
+
+        Assert.NotNull(reader);
+
+        var entries = new List<int>();
+        while (reader.Read())
+            entries.Add(reader.GetInt32(0));
+
+        Assert.Collection(entries,
+            e => Assert.Equal(1, e),
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(3, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+    [Fact]
+    public async Task ExecuteReaderAsync_WithParams_ReturnsExpectedResults()
     {
         var ct = CancellationToken.None;
 
@@ -233,6 +268,42 @@ where
 
         var entries = new List<int>();
         while (await reader.ReadAsync(ct))
+            entries.Add(reader.GetInt32(0));
+
+        Assert.Collection(entries,
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+    [Fact]
+    public void ExecuteReader_WithParams_ReturnsExpectedResults()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        using var reader = session.ExecuteReader(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 Value union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value in @Values", new
+        {
+            Values = (int[])[2, 4]
+        });
+
+        Assert.NotNull(reader);
+
+        var entries = new List<int>();
+        while (reader.Read())
             entries.Add(reader.GetInt32(0));
 
         Assert.Collection(entries,
