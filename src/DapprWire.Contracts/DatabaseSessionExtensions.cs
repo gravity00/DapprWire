@@ -705,7 +705,7 @@ public static class DatabaseSessionExtensions
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
-    /// <returns>A task to be awaited for the query result.</returns>
+    /// <returns>The query result.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static T? QueryFirstOrDefault<T>(
         this IDatabaseSession databaseSession,
