@@ -550,6 +550,8 @@ public static class DatabaseSessionExtensions
 
     #endregion
 
+    #region QueryFirst
+
     /// <summary>
     /// Executes a SQL command and returns the first result of type T.
     /// </summary>
@@ -557,7 +559,7 @@ public static class DatabaseSessionExtensions
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the query result.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<T> QueryFirstAsync<T>(
         this IDatabaseSession databaseSession,
@@ -575,9 +577,26 @@ public static class DatabaseSessionExtensions
     /// <typeparam name="T">The result type.</typeparam>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
+    /// <returns>The query result.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static T QueryFirst<T>(
+        this IDatabaseSession databaseSession,
+        string sql
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryFirst<T>(sql, SqlOptions.None);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the query result.</returns>
     /// <exception cref="ArgumentNullException"></exception>
     public static Task<T> QueryFirstAsync<T>(
         this IDatabaseSession databaseSession,
@@ -592,6 +611,30 @@ public static class DatabaseSessionExtensions
             Parameters = parameters
         }, ct);
     }
+
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <returns>The query result.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static T QueryFirst<T>(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryFirst<T>(sql, new SqlOptions
+        {
+            Parameters = parameters
+        });
+    }
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns the first result of type T.

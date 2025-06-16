@@ -211,6 +211,8 @@ public interface IDatabaseSession : IDisposable
 
     #endregion
 
+    #region QueryFirst
+
     /// <summary>
     /// Executes a SQL command and returns the first result of type T.
     /// </summary>
@@ -218,12 +220,26 @@ public interface IDatabaseSession : IDisposable
     /// <param name="sql">The SQL command.</param>
     /// <param name="sqlOptions">The SQL options.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the query result.</returns>
     Task<T> QueryFirstAsync<T>(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
     );
+
+    /// <summary>
+    /// Executes a SQL command and returns the first result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <returns>The query result.</returns>
+    T QueryFirst<T>(
+        string sql,
+        SqlOptions sqlOptions
+    );
+
+    #endregion
 
     /// <summary>
     /// Executes a SQL command and returns the first result of type T.
