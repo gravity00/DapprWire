@@ -151,6 +151,8 @@ public interface IDatabaseSession : IDisposable
 
     #endregion
 
+    #region QuerySingle
+
     /// <summary>
     /// Executes a SQL command and returns a single result of type T.
     /// </summary>
@@ -158,12 +160,26 @@ public interface IDatabaseSession : IDisposable
     /// <param name="sql">The SQL command.</param>
     /// <param name="sqlOptions">The SQL options.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the query result.</returns>
     Task<T> QuerySingleAsync<T>(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
     );
+
+    /// <summary>
+    /// Executes a SQL command and returns a single result of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <returns>The query result.</returns>
+    T QuerySingle<T>(
+        string sql,
+        SqlOptions sqlOptions
+    );
+
+    #endregion
 
     #region QuerySingleOrDefault
 
