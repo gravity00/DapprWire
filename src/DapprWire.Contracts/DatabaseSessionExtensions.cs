@@ -722,13 +722,16 @@ public static class DatabaseSessionExtensions
 
     #endregion
 
+    #region QueryMultiple
+
     /// <summary>
     /// Executes a SQL command and returns a grid reader for multiple result sets.
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the database grid reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static Task<IDatabaseGridReader> QueryMultipleAsync(
         this IDatabaseSession databaseSession,
         string sql,
@@ -744,9 +747,25 @@ public static class DatabaseSessionExtensions
     /// </summary>
     /// <param name="databaseSession">The database instance.</param>
     /// <param name="sql">The SQL command.</param>
+    /// <returns>The database grid reader.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IDatabaseGridReader QueryMultiple(
+        this IDatabaseSession databaseSession,
+        string sql
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryMultiple(sql, SqlOptions.None);
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a grid reader for multiple result sets.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
     /// <param name="parameters">The SQL command parameters.</param>
     /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the result</returns>
+    /// <returns>A task to be awaited for the database grid reader.</returns>
     public static Task<IDatabaseGridReader> QueryMultipleAsync(
         this IDatabaseSession databaseSession,
         string sql,
@@ -760,6 +779,28 @@ public static class DatabaseSessionExtensions
             Parameters = parameters
         }, ct);
     }
+
+    /// <summary>
+    /// Executes a SQL command and returns a grid reader for multiple result sets.
+    /// </summary>
+    /// <param name="databaseSession">The database instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <returns>The database grid reader.</returns>
+    public static IDatabaseGridReader QueryMultiple(
+        this IDatabaseSession databaseSession,
+        string sql,
+        object parameters
+    )
+    {
+        EnsureNotNull(databaseSession);
+        return databaseSession.QueryMultiple(sql, new SqlOptions
+        {
+            Parameters = parameters
+        });
+    }
+
+    #endregion
 
     private static void EnsureNotNull(IDatabaseSession databaseSession)
     {

@@ -82,10 +82,24 @@ public class DatabaseGridReader(
     }
 
     /// <inheritdoc />
+    public IEnumerable<T> Read<T>()
+    {
+        EnsureNotDisposed();
+        return _gridReader!.Read<T>();
+    }
+
+    /// <inheritdoc />
     public Task<T> ReadFirstAsync<T>()
     {
         EnsureNotDisposed();
         return _gridReader!.ReadFirstAsync<T>();
+    }
+
+    /// <inheritdoc />
+    public T ReadFirst<T>()
+    {
+        EnsureNotDisposed();
+        return _gridReader!.ReadFirst<T>();
     }
 
     /// <inheritdoc />
@@ -96,6 +110,13 @@ public class DatabaseGridReader(
     }
 
     /// <inheritdoc />
+    public T? ReadFirstOrDefault<T>()
+    {
+        EnsureNotDisposed();
+        return _gridReader!.ReadFirstOrDefault<T>();
+    }
+
+    /// <inheritdoc />
     public Task<T> ReadSingleAsync<T>()
     {
         EnsureNotDisposed();
@@ -103,10 +124,24 @@ public class DatabaseGridReader(
     }
 
     /// <inheritdoc />
+    public T ReadSingle<T>()
+    {
+        EnsureNotDisposed();
+        return _gridReader!.ReadSingle<T>();
+    }
+
+    /// <inheritdoc />
     public Task<T?> ReadSingleOrDefaultAsync<T>()
     {
         EnsureNotDisposed();
         return _gridReader!.ReadSingleOrDefaultAsync<T>();
+    }
+
+    /// <inheritdoc />
+    public T? ReadSingleOrDefault<T>()
+    {
+        EnsureNotDisposed();
+        return _gridReader!.ReadSingleOrDefault<T>();
     }
 
     private void EnsureNotDisposed()
