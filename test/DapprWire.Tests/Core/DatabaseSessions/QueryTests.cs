@@ -7,7 +7,7 @@ public class QueryTests(DatabaseFixture fixture, ITestOutputHelper output)
     #region Query
 
     [Fact]
-    public async Task Query_NoParams_ReturnsExpectedResults()
+    public async Task QueryAsync_NoParams_ReturnsExpectedResults()
     {
         var ct = CancellationToken.None;
 
@@ -38,7 +38,36 @@ where
     }
 
     [Fact]
-    public async Task Query_WithParams_ReturnsExpectedResults()
+    public void Query_NoParams_ReturnsExpectedResults()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var entries = session.Query<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value is not null");
+
+        Assert.Collection(entries,
+            e => Assert.Equal(1, e),
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(3, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+    [Fact]
+    public async Task QueryAsync_WithParams_ReturnsExpectedResults()
     {
         var ct = CancellationToken.None;
 
@@ -62,6 +91,36 @@ where
         {
             Values = (int[]) [2, 4]
         }, ct);
+
+        Assert.Collection(entries,
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+    [Fact]
+    public void Query_WithParams_ReturnsExpectedResults()
+    {
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        using var session = database.Connect();
+
+        var entries = session.Query<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value in @Values", new
+        {
+            Values = (int[]) [2, 4]
+        });
 
         Assert.Collection(entries,
             e => Assert.Equal(2, e),
