@@ -481,16 +481,10 @@ public class DatabaseSession(
     /// <exception cref="ObjectDisposedException"></exception>
     public void Connect() => GetDbConnection();
 
-    /// <summary>
-    /// Ensures the database connection is initialized and opens it if necessary.
-    /// </summary>
-    /// <param name="ct">The cancellation token.</param>
-    /// <returns>A task to be awaited for the database connection.</returns>
-    /// <exception cref="ObjectDisposedException"></exception>
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-    protected async ValueTask<DbConnection> GetDbConnectionAsync(CancellationToken ct)
+    private async ValueTask<DbConnection> GetDbConnectionAsync(CancellationToken ct)
 #else
-    protected async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
+    private async Task<DbConnection> GetDbConnectionAsync(CancellationToken ct)
 #endif
     {
         EnsureNotDisposed();
@@ -515,12 +509,7 @@ public class DatabaseSession(
         return _connection;
     }
 
-    /// <summary>
-    /// Ensures the database connection is initialized and opens it if necessary.
-    /// </summary>
-    /// <returns>The database connection.</returns>
-    /// <exception cref="ObjectDisposedException"></exception>
-    protected DbConnection GetDbConnection()
+    private DbConnection GetDbConnection()
     {
         EnsureNotDisposed();
 
@@ -546,11 +535,7 @@ public class DatabaseSession(
         return _connection;
     }
 
-    /// <summary>
-    /// Ensures that the database connection has not been disposed.
-    /// </summary>
-    /// <exception cref="ObjectDisposedException"></exception>
-    protected void EnsureNotDisposed()
+    private void EnsureNotDisposed()
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(DatabaseSession));
