@@ -11,41 +11,6 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds the database services to the service collection.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="connectionFactory">The connection factory.</param>
-    /// <param name="config">An optional callback to configure database options.</param>
-    /// <returns>The service collection after changes.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public static IServiceCollection AddDatabase(
-        this IServiceCollection services,
-        Func<IServiceProvider, DbConnection> connectionFactory,
-        Action<DatabaseOptions>? config = null
-    )
-    {
-        if (services is null) throw new ArgumentNullException(nameof(services));
-        if (connectionFactory is null) throw new ArgumentNullException(nameof(connectionFactory));
-
-        if (config is not null)
-            services.Configure(config);
-
-        services.TryAddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
-        services.TryAddSingleton(s =>
-        {
-            var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-            if (ReferenceEquals(options.Logger, DatabaseLogger.Null))
-                options.Logger = s.GetRequiredService<DatabaseLogger>();
-            return options;
-        });
-        services.TryAddTransient<DbConnectionFactory>(s => () => connectionFactory(s));
-        services.TryAddSingleton<IDatabase, Database>();
-        services.TryAddScoped<IDatabaseSession, DatabaseSession>();
-
-        return services;
-    }
-
-    /// <summary>
     /// Adds the strongly-typed database services to the service collection.
     /// </summary>
     /// <typeparam name="TName">The database name.</typeparam>
@@ -104,6 +69,20 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Adds the database services to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="config">An optional callback to configure database options.</param>
+    /// <returns>The service collection after changes.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IServiceCollection AddDatabase(
+        this IServiceCollection services,
+        Func<IServiceProvider, DbConnection> connectionFactory,
+        Action<DatabaseOptions>? config = null
+    ) => services.AddDatabaseAsDefault<DefaultDatabaseName>(connectionFactory, config);
 
     private static void TryAddSingleton<TService, TImplementation>(
         this IServiceCollection services

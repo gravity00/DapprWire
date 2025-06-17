@@ -16,7 +16,7 @@ public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         var databaseFactory = host.Services.GetService<IDatabase>();
         
         Assert.NotNull(databaseFactory);
-        Assert.IsType<Database>(databaseFactory);
+        Assert.IsType<Database<DefaultDatabaseName>>(databaseFactory);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         var database = scope.ServiceProvider.GetService<IDatabaseSession>();
         
         Assert.NotNull(database);
-        Assert.IsType<DatabaseSession>(database);
+        Assert.IsType<DatabaseSession<DefaultDatabaseName>>(database);
     }
 
     [Fact]

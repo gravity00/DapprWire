@@ -4,7 +4,7 @@ using System.Data.Common;
 namespace DapprWire;
 
 /// <summary>
-/// Represents a database connection.
+/// Represents a database session.
 /// </summary>
 public interface IDatabaseSession : IDisposable
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
@@ -301,7 +301,7 @@ public interface IDatabaseSession : IDisposable
 }
 
 /// <summary>
-/// Represents a strongly-typed database connection.
+/// Represents a strongly-typed database session.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabaseSession<TName> : IDatabaseSession

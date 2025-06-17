@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DapprWire.Core.Databases;
+namespace DapprWire.Core;
 
 [Collection(nameof(RequireDatabase))]
 public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
@@ -8,7 +8,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     [Fact]
     public void Constructor_NullDatabaseOptions_Fails()
     {
-        Assert.Throws<ArgumentNullException>(() => new Database(
+        Assert.Throws<ArgumentNullException>(() => new Database<DefaultDatabaseName>(
             null!,
             fixture.GetDbConnection
         ));
@@ -17,7 +17,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     [Fact]
     public void Constructor_NullDbConnectionFactory_Fails()
     {
-        Assert.Throws<ArgumentNullException>(() => new Database(
+        Assert.Throws<ArgumentNullException>(() => new Database<DefaultDatabaseName>(
             CoreHelpers.CreateDatabaseOptions(output),
             null!
         ));
@@ -31,7 +31,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         await using var session = await database.ConnectAsync(CancellationToken.None);
 
         Assert.NotNull(session);
-        Assert.IsType<DatabaseSession>(session);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(session);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
         using var session = database.Connect();
 
         Assert.NotNull(session);
-        Assert.IsType<DatabaseSession>(session);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(session);
     }
 
     [Fact]
