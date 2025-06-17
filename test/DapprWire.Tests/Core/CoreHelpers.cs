@@ -18,24 +18,14 @@ public static class CoreHelpers
         return options;
     }
 
-    public static Database CreateTestDatabase(
+    public static Database<TestDatabaseName> CreateTestDatabase(
         ITestOutputHelper output,
         Func<DbConnection> dbConnectionFactory,
         Action<DatabaseOptions>? config = null
     )
     {
         var options = CreateDatabaseOptions(output, config);
-        return new Database(options, () => dbConnectionFactory());
-    }
-
-    public static Database CreateTestDatabase<TName>(
-        ITestOutputHelper output,
-        Func<DbConnection> dbConnectionFactory,
-        Action<DatabaseOptions>? config = null
-    ) where TName : IDatabaseName
-    {
-        var options = CreateDatabaseOptions(output, config);
-        return new Database<TName>(options, () => dbConnectionFactory());
+        return new Database<TestDatabaseName>(options, () => dbConnectionFactory());
     }
 
     public static async Task CreateTestTableRowAsync(

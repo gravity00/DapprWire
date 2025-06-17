@@ -3,14 +3,15 @@
 namespace DapprWire;
 
 /// <summary>
-/// Represents a database connection.
+/// Represents a strongly-typed database session.
 /// </summary>
+/// <typeparam name="TName">The database name.</typeparam>
 /// <param name="options">The database options.</param>
 /// <param name="dbConnectionFactory">The <see cref="DbConnection"/> factory.</param>
-public class DatabaseSession(
+public class DatabaseSession<TName>(
     DatabaseOptions options,
-    DbConnectionFactory dbConnectionFactory
-) : IDatabaseSession
+    DbConnectionFactory<TName> dbConnectionFactory
+) : IDatabaseSession<TName> where TName : IDatabaseName
 {
     private bool _disposed;
     private DbConnection? _connection;
@@ -96,7 +97,7 @@ public class DatabaseSession(
         if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
-        options.Logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
+        options.Logger.LogDebug<DatabaseSession<TName>>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         var transaction = await connection.BeginTransactionAsync(isolationLevel, ct).ConfigureAwait(false);
 #else
@@ -105,7 +106,7 @@ public class DatabaseSession(
 
         _transaction = transaction;
 
-        options.Logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
+        options.Logger.LogInfo<DatabaseSession<TName>>("Database transaction started successfully", isolationLevel);
 
         return new DatabaseTransaction(options, transaction, () =>
         {
@@ -128,12 +129,12 @@ public class DatabaseSession(
         if (isolationLevel == default)
             isolationLevel = options.DefaultIsolationLevel;
 
-        options.Logger.LogDebug<DatabaseSession>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
+        options.Logger.LogDebug<DatabaseSession<TName>>("Starting a new database transaction [IsolationLevel:{IsolationLevel}]", isolationLevel);
         var transaction = connection.BeginTransaction(isolationLevel);
 
         _transaction = transaction;
 
-        options.Logger.LogInfo<DatabaseSession>("Database transaction started successfully", isolationLevel);
+        options.Logger.LogInfo<DatabaseSession<TName>>("Database transaction started successfully", isolationLevel);
 
         return new DatabaseTransaction(options, transaction, () =>
         {
@@ -491,20 +492,20 @@ public class DatabaseSession(
 
         if (_connection is null)
         {
-            options.Logger.LogDebug<DatabaseSession>("Creating a new database connection...");
+            options.Logger.LogDebug<DatabaseSession<TName>>("Creating a new database connection...");
             _connection = dbConnectionFactory();
         }
 
         if (_connection.State is ConnectionState.Open)
             return _connection;
 
-        options.Logger.LogDebug<DatabaseSession>("Opening the database connection...");
+        options.Logger.LogDebug<DatabaseSession<TName>>("Opening the database connection...");
         await _connection.OpenAsync(ct).ConfigureAwait(false);
 
         if (options.OnConnectionOpen is not null)
             await options.OnConnectionOpen(_connection, ct).ConfigureAwait(false);
 
-        options.Logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
+        options.Logger.LogInfo<DatabaseSession<TName>>("Database connection opened successfully.");
 
         return _connection;
     }
@@ -515,14 +516,14 @@ public class DatabaseSession(
 
         if (_connection is null)
         {
-            options.Logger.LogDebug<DatabaseSession>("Creating a new database connection...");
+            options.Logger.LogDebug<DatabaseSession<TName>>("Creating a new database connection...");
             _connection = dbConnectionFactory();
         }
 
         if (_connection.State is ConnectionState.Open)
             return _connection;
 
-        options.Logger.LogDebug<DatabaseSession>("Opening the database connection...");
+        options.Logger.LogDebug<DatabaseSession<TName>>("Opening the database connection...");
         _connection.Open();
 
         options.OnConnectionOpen?.Invoke(_connection, CancellationToken.None)
@@ -530,7 +531,7 @@ public class DatabaseSession(
             .GetAwaiter()
             .GetResult();
 
-        options.Logger.LogInfo<DatabaseSession>("Database connection opened successfully.");
+        options.Logger.LogInfo<DatabaseSession<TName>>("Database connection opened successfully.");
 
         return _connection;
     }
@@ -538,7 +539,7 @@ public class DatabaseSession(
     private void EnsureNotDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(DatabaseSession));
+            throw new ObjectDisposedException(nameof(DatabaseSession<TName>));
     }
 
     private CommandDefinition CreateCommandDefinition(
@@ -556,9 +557,9 @@ public class DatabaseSession(
 
     private void LogCommandDefinition(CommandDefinition command)
     {
-        if (options.Logger.IsEnabled<DatabaseSession>(DatabaseLogLevel.Debug))
+        if (options.Logger.IsEnabled<DatabaseSession<TName>>(DatabaseLogLevel.Debug))
         {
-            options.Logger.LogDebug<DatabaseSession>(@"Executing SQL command
+            options.Logger.LogDebug<DatabaseSession<TName>>(@"Executing SQL command
 [HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
 {CommandText}",
                 command.Parameters is not null,
@@ -570,15 +571,3 @@ public class DatabaseSession(
         }
     }
 }
-
-/// <summary>
-/// Represents a strongly-typed database connection.
-/// </summary>
-/// <typeparam name="TName">The database name.</typeparam>
-/// <param name="options">The database options.</param>
-/// <param name="dbConnectionFactory">The strongly-typed <see cref="DbConnection"/> factory.</param>
-public class DatabaseSession<TName>(
-    DatabaseOptions options,
-    DbConnectionFactory<TName> dbConnectionFactory
-) : DatabaseSession(options, () => dbConnectionFactory()), IDatabaseSession<TName>
-    where TName : IDatabaseName;

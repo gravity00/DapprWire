@@ -1,7 +1,7 @@
 ﻿namespace DapprWire;
 
 /// <summary>
-/// Represents a factory for creating database connections.
+/// Represents a database.
 /// </summary>
 public interface IDatabase
 {
@@ -20,7 +20,7 @@ public interface IDatabase
 }
 
 /// <summary>
-/// Represents a strongly-typed factory for creating database connections.
+/// Represents a strongly-typed database.
 /// </summary>
 /// <typeparam name="TName">The database name.</typeparam>
 public interface IDatabase<TName> : IDatabase
