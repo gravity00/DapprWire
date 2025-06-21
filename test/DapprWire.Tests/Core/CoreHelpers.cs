@@ -1,4 +1,6 @@
-﻿using System.Data.Common;
+﻿using System.Collections.Concurrent;
+using System.Data.Common;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DapprWire.Core;
@@ -115,6 +117,7 @@ where
     private class TestDatabaseLogger(ITestOutputHelper output) : DatabaseLogger
     {
         private static readonly Regex LogParameterRegex = new(@"\{[A-Za-z0-9]+\}", RegexOptions.Compiled);
+        private static readonly ConcurrentDictionary<Type, string> LogNameCache = new();
 
         public override void Log<T>(DatabaseLogLevel level, Exception? exception, string message, params object?[] args)
         {
@@ -131,7 +134,29 @@ where
                     });
                 }
 
-                output.WriteLine($"{DateTimeOffset.UtcNow:O} [{level}] {typeof(T).FullName} | {message}");
+                var logName = LogNameCache.GetOrAdd(typeof(T), type =>
+                {
+                    var sb = new StringBuilder();
+
+                    if (!string.IsNullOrWhiteSpace(type.Namespace))
+                        sb.Append(type.Namespace).Append('.');
+
+                    if (type.IsGenericType)
+                    {
+                        sb.Append(type.Name, 0, type.Name.Length - 2);
+                        sb.Append('<');
+                        sb.AppendJoin(", ", type.GenericTypeArguments.Select(arg => arg.Name));
+                        sb.Append('>');
+                    }
+                    else
+                    {
+                        sb.Append(type.Name);
+                    }
+
+                    return sb.ToString();
+                });
+
+                output.WriteLine($"{DateTimeOffset.UtcNow:O} [{level}] {logName} | {message}");
                 if (exception is not null)
                     output.WriteLine(exception.ToString());
             }
