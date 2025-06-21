@@ -330,9 +330,9 @@ public abstract class DatabaseSqlRunner<TName>(
 
     private void LogCommandDefinition(CommandDefinition command)
     {
-        if (options.Logger.IsEnabled<DatabaseSession<TName>>(DatabaseLogLevel.Debug))
+        if (options.Logger.IsEnabled<DatabaseSqlRunner<TName>>(DatabaseLogLevel.Debug))
         {
-            options.Logger.LogDebug<DatabaseSession<TName>>(@"Executing SQL command
+            options.Logger.LogDebug<DatabaseSqlRunner<TName>>(@"Executing SQL command
 [HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
 {CommandText}",
                 command.Parameters is not null,
