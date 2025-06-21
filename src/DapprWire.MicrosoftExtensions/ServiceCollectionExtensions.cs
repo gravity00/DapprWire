@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.TryAddTransient<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.TryAddSingleton<IDatabase<TName>, Database<TName>>();
         services.TryAddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
+        services.TryAddScoped<IDatabaseSqlRunner<TName>>(s => s.GetRequiredService<IDatabaseSession<TName>>());
 
         return services;
     }
@@ -66,6 +67,7 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<IDatabase>(s => s.GetRequiredService<IDatabase<TName>>());
         services.TryAddScoped<IDatabaseSession>(s => s.GetRequiredService<IDatabaseSession<TName>>());
+        services.TryAddScoped<IDatabaseSqlRunner>(s => s.GetRequiredService<IDatabaseSession>());
 
         return services;
     }

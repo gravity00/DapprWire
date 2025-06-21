@@ -6,21 +6,21 @@ namespace DapprWire.MicrosoftExtensions;
 public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     [Fact]
-    public void DatabaseFactoryNamed_Resolve_Singleton_Succeed()
+    public void DatabaseNamed_Resolve_Singleton_Succeed()
     {
         using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
         {
             builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
         });
         
-        var databaseFactory = host.Services.GetService<IDatabase<TestDatabaseName>>();
+        var database = host.Services.GetService<IDatabase<TestDatabaseName>>();
         
-        Assert.NotNull(databaseFactory);
-        Assert.IsType<Database<TestDatabaseName>>(databaseFactory);
+        Assert.NotNull(database);
+        Assert.IsType<Database<TestDatabaseName>>(database);
     }
 
     [Fact]
-    public void DatabaseNamed_Resolve_Scoped_Succeed()
+    public void DatabaseSessionNamed_Resolve_Scoped_Succeed()
     {
         using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
         {
@@ -29,14 +29,14 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>();
+        var databaseSession = scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>();
         
-        Assert.NotNull(database);
-        Assert.IsType<DatabaseSession<TestDatabaseName>>(database);
+        Assert.NotNull(databaseSession);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(databaseSession);
     }
 
     [Fact]
-    public void DatabaseNamed_Resolve_NotScoped_Fail()
+    public void DatabaseSessionNamed_Resolve_NotScoped_Fail()
     {
         using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
         {
@@ -49,20 +49,7 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
     }
 
     [Fact]
-    public void DatabaseFactory_Resolve_Singleton_Null()
-    {
-        using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
-        {
-            builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
-        });
-
-        var databaseFactory = host.Services.GetService<IDatabase>();
-
-        Assert.Null(databaseFactory);
-    }
-
-    [Fact]
-    public void Database_Resolve_Scoped_Null()
+    public void DatabaseSqlRunnerNamed_Resolve_Scoped_Succeed()
     {
         using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
         {
@@ -71,8 +58,54 @@ public class AddDatabaseNamedTests(DatabaseFixture fixture, ITestOutputHelper ou
 
         using var scope = host.Services.CreateScope();
 
-        var database = scope.ServiceProvider.GetService<IDatabaseSession>();
+        var databaseSqlRunner = scope.ServiceProvider.GetService<IDatabaseSqlRunner<TestDatabaseName>>();
+        
+        Assert.NotNull(databaseSqlRunner);
+        Assert.IsType<DatabaseSession<TestDatabaseName>>(databaseSqlRunner);
+        Assert.Same(
+            scope.ServiceProvider.GetService<IDatabaseSession<TestDatabaseName>>(),
+            databaseSqlRunner
+        );
+    }
+
+    [Fact]
+    public void DatabaseSqlRunnerNamed_Resolve_NotScoped_Fail()
+    {
+        using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
+        {
+            builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
+        });
+
+        Assert.Throws<InvalidOperationException>(
+            () => host.Services.GetService<IDatabaseSqlRunner<TestDatabaseName>>()
+        );
+    }
+
+    [Fact]
+    public void Database_Resolve_Singleton_Null()
+    {
+        using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
+        {
+            builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
+        });
+
+        var database = host.Services.GetService<IDatabase>();
 
         Assert.Null(database);
+    }
+
+    [Fact]
+    public void DatabaseSession_Resolve_Scoped_Null()
+    {
+        using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
+        {
+            builder.Services.AddDatabase<TestDatabaseName>(_ => fixture.GetDbConnection());
+        });
+
+        using var scope = host.Services.CreateScope();
+
+        var databaseSession = scope.ServiceProvider.GetService<IDatabaseSession>();
+
+        Assert.Null(databaseSession);
     }
 }
