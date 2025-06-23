@@ -28,7 +28,10 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(CancellationToken.None);
 
         Assert.NotNull(session);
         Assert.IsType<DatabaseSession<TestDatabaseName>>(session);
@@ -61,7 +64,10 @@ public class DatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
             };
         });
 
-        await using var session = await database.ConnectAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(CancellationToken.None);
 
         Assert.True(onConnectionOpenInvoked);
     }

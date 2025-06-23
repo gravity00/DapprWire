@@ -14,8 +14,11 @@ public sealed class DatabaseFixture : IAsyncLifetime
         _container = new MsSqlBuilder().Build();
 
         await _container.StartAsync();
-
-        await using var connection = GetDbConnection();
+        
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var connection = GetDbConnection();
         await connection.OpenAsync();
 
         await connection.ExecuteAsync(@"

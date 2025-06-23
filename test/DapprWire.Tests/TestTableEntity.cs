@@ -2,9 +2,9 @@
 
 public record TestTableEntity
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
 
-    public Guid ExternalId { get; init; }
+    public Guid ExternalId { get; set; }
 
-    public string Name { get; init; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

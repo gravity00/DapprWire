@@ -145,7 +145,7 @@ where
                     {
                         sb.Append(type.Name, 0, type.Name.Length - 2);
                         sb.Append('<');
-                        sb.AppendJoin(", ", type.GenericTypeArguments.Select(arg => arg.Name));
+                        sb.Append(string.Join(", ", type.GenericTypeArguments.Select(arg => arg.Name)));
                         sb.Append('>');
                     }
                     else
