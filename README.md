@@ -27,7 +27,7 @@ All packages directly target the following frameworks:
 * .NET Standard 2.1;
 * .NET 5.0
 
-This means you should be able to use it almost everywhere that needs to access a SQL database, from an ASP.NET Core 8 API to a Windows Service, command line terminal and even on older ASP.NET Core 2 applications.
+This means you should be able to use it almost everywhere that needs to access a SQL database, from an ASP.NET Core 8 application to a Windows Service, command line terminal and even on older ASP.NET Core 2 applications.
 
 ## :rocket: Features
 
@@ -173,7 +173,7 @@ builder.Services.AddDatabase(_ => new SqlConnection(connectionString), options =
 
 ## :hammer: Build
 
-You should be able to easily build this solution as long you have installed both SDKs for .NET 8.0 and .NET Framework 4.6.1, but more recent versions should also work.
+You should be able to easily build this solution as long you have installed both SDKs for .NET 8.0 and .NET Framework 4.8, but more recent versions should also work.
 
 ```sh
 git clone https://github.com/gravity00/DapprWire.git DapprWire
