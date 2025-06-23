@@ -8,9 +8,15 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(CancellationToken.None);
 
-        await using var transaction = await session.BeginTransactionAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var transaction = await session.BeginTransactionAsync(CancellationToken.None);
 
         Assert.NotNull(transaction);
         Assert.IsType<DatabaseTransaction>(transaction);
@@ -34,9 +40,15 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
     {
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(CancellationToken.None);
 
-        await using var transaction = await session.BeginTransactionAsync(CancellationToken.None);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var transaction = await session.BeginTransactionAsync(CancellationToken.None);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -67,16 +79,25 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
-            await using var transaction = await session.BeginTransactionAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+            using var transaction = await session.BeginTransactionAsync(ct);
 
             await session.CreateTestTableRowAsync(externalId, $"Test '{externalId}'", ct);
 
             await transaction.CommitAsync(ct);
         }
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
             var testTableRow = await session.GetTestTableRowByExternalIdAsync(externalId, ct);
 
@@ -118,16 +139,25 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
-            await using var transaction = await session.BeginTransactionAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+            using var transaction = await session.BeginTransactionAsync(ct);
             
             await session.CreateTestTableRowAsync(externalId, $"Test '{externalId}'", ct);
 
             await transaction.RollbackAsync(ct);
         }
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
             var testTableRow = await session.GetTestTableRowByExternalIdAsync(externalId, ct);
             
@@ -167,14 +197,23 @@ public class DatabaseTransactionTests(DatabaseFixture fixture, ITestOutputHelper
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
-            await using var transaction = await session.BeginTransactionAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+            using var transaction = await session.BeginTransactionAsync(ct);
             
             await session.CreateTestTableRowAsync(externalId, $"Test '{externalId}'", ct);
         }
 
-        await using (var session = await database.ConnectAsync(ct))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using (var session = await database.ConnectAsync(ct))
         {
             var testTableRow = await session.GetTestTableRowByExternalIdAsync(externalId, ct);
             

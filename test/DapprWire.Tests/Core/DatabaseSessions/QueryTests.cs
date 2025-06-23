@@ -13,7 +13,10 @@ public class QueryTests(DatabaseFixture fixture, ITestOutputHelper output)
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var entries = await session.QueryAsync<int>(@"with
 TestDataCte as (
@@ -73,7 +76,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var entries = await session.QueryAsync<int>(@"with
 TestDataCte as (
@@ -139,7 +145,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QuerySingleAsync<int>(@"with
 TestDataCte as (
@@ -189,7 +198,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QuerySingleAsync<int>(@"with
 TestDataCte as (
@@ -245,7 +257,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -297,7 +312,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -353,7 +371,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -405,7 +426,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -463,7 +487,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QuerySingleOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -513,7 +540,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -569,7 +599,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QueryFirstAsync<int>(@"with
 TestDataCte as (
@@ -619,7 +652,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QueryFirstAsync<int>(@"with
 TestDataCte as (
@@ -675,7 +711,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -731,7 +770,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QueryFirstOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -783,7 +825,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QueryFirstOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -841,7 +886,10 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var value = await session.QueryFirstOrDefaultAsync<int?>(@"with
 TestDataCte as (
@@ -895,9 +943,15 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
-        await using var gridReader = await session.QueryMultipleAsync(@"with
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var gridReader = await session.QueryMultipleAsync(@"with
 TestDataCte as (
     select null as Value union all
 
@@ -967,9 +1021,15 @@ select -1;");
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
-        await using var gridReader = await session.QueryMultipleAsync(@"with
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var gridReader = await session.QueryMultipleAsync(@"with
 TestDataCte as (
     select null as Value union all
 

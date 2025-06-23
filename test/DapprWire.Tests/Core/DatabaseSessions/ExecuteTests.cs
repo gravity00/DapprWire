@@ -14,7 +14,10 @@ public class ExecuteTests(DatabaseFixture fixture, ITestOutputHelper output)
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var result = await session.ExecuteAsync($@"
 insert into TestTable (ExternalId, Name)
@@ -47,7 +50,10 @@ values ('{externalId}', 'Test {externalId}')");
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var result = await session.ExecuteAsync(@"
 insert into TestTable (ExternalId, Name)
@@ -92,7 +98,10 @@ values (@ExternalId, @Name)", new
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var result = await session.ExecuteScalarAsync<int>($@"
 insert into TestTable (ExternalId, Name)
@@ -127,7 +136,10 @@ select cast(SCOPE_IDENTITY() as int);");
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
         var result = await session.ExecuteScalarAsync<int>(@"
 insert into TestTable (ExternalId, Name)
@@ -173,9 +185,15 @@ select cast(SCOPE_IDENTITY() as int);", new
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
-        await using var reader = await session.ExecuteReaderAsync(@"with
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var reader = await session.ExecuteReaderAsync(@"with
 TestDataCte as (
     select null as Value union all
 
@@ -245,9 +263,15 @@ where
 
         var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
 
-        await using var session = await database.ConnectAsync(ct);
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var session = await database.ConnectAsync(ct);
 
-        await using var reader = await session.ExecuteReaderAsync(@"with
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        await
+#endif
+        using var reader = await session.ExecuteReaderAsync(@"with
 TestDataCte as (
     select null as Value union all
 
