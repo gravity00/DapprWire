@@ -271,6 +271,28 @@ public interface IDatabaseSqlRunner
     );
 
     #endregion
+
+    #region QueryStreamed
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+
+    /// <summary>
+    /// Executes a SQL command and returns a streamed collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The async enumerator to stream each item asynchronously.</returns>
+    IAsyncEnumerable<T> QueryStreamed<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        CancellationToken ct = default
+    );
+
+#endif
+
+    #endregion
 }
 
 /// <summary>

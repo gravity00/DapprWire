@@ -292,6 +292,34 @@ public abstract class DatabaseSqlRunner<TName>(
 
     #endregion
 
+    #region QueryStreamed
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+
+    /// <summary>
+    /// Executes a SQL command and returns a streamed collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="sqlOptions">The SQL options.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The async enumerator to stream each item asynchronously.</returns>
+    public async IAsyncEnumerable<T> QueryStreamed<T>(
+        string sql,
+        SqlOptions sqlOptions,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default
+    )
+    {
+        await using var reader = await ExecuteReaderAsync(sql, sqlOptions, ct).ConfigureAwait(false);
+        var parser = reader.GetRowParser<T>();
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+            yield return parser(reader);
+    }
+
+#endif
+
+    #endregion
+
     /// <summary>
     /// Returns a database connection, that must be open.
     /// </summary>

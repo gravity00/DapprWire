@@ -768,6 +768,63 @@ public static class DatabaseSqlRunnerExtensions
 
     #endregion
 
+    #region QueryStreamed
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+
+    /// <summary>
+    /// Executes a SQL command and returns a streamed collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSqlRunner">The database SQL runner instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The async enumerator to stream each item asynchronously.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static async IAsyncEnumerable<T> QueryStreamed<T>(
+        this IDatabaseSqlRunner databaseSqlRunner,
+        string sql,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default
+    )
+    {
+        EnsureNotNull(databaseSqlRunner);
+
+        var sqlOptions = SqlOptions.None;
+        await foreach (var item in databaseSqlRunner.QueryStreamed<T>(sql, sqlOptions, ct).ConfigureAwait(false))
+            yield return item;
+    }
+
+    /// <summary>
+    /// Executes a SQL command and returns a streamed collection of results of type T.
+    /// </summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="databaseSqlRunner">The database SQL runner instance.</param>
+    /// <param name="sql">The SQL command.</param>
+    /// <param name="parameters">The SQL command parameters.</param>
+    /// <param name="ct">The cancellation token.</param>
+    /// <returns>The async enumerator to stream each item asynchronously.</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static async IAsyncEnumerable<T> QueryStreamed<T>(
+        this IDatabaseSqlRunner databaseSqlRunner,
+        string sql,
+        object parameters,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default
+    )
+    {
+        EnsureNotNull(databaseSqlRunner);
+
+        var sqlOptions = new SqlOptions
+        {
+            Parameters = parameters
+        };
+        await foreach (var item in databaseSqlRunner.QueryStreamed<T>(sql, sqlOptions, ct))
+            yield return item;
+    }
+
+#endif
+
+    #endregion
+
     private static void EnsureNotNull(IDatabaseSqlRunner databaseSqlRunner)
     {
         if (databaseSqlRunner is null)
