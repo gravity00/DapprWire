@@ -1095,4 +1095,83 @@ select -1;", new
     }
 
     #endregion
+
+    #region QueryStreamed
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+
+    [Fact]
+    public async Task QueryStreamed_NoParams_ReturnsExpectedResults()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var entriesStream = session.QueryStreamed<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value is not null", ct);
+
+        var entries = new List<int>();
+        await foreach (var entry in entriesStream)
+            entries.Add(entry);
+
+        Assert.Collection(entries,
+            e => Assert.Equal(1, e),
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(3, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+    [Fact]
+    public async Task QueryStreamed_WithParams_ReturnsExpectedResults()
+    {
+        var ct = CancellationToken.None;
+
+        var database = CoreHelpers.CreateTestDatabase(output, fixture.GetDbConnection);
+
+        await using var session = await database.ConnectAsync(ct);
+
+        var entriesStream = session.QueryStreamed<int>(@"with
+TestDataCte as (
+    select null as Value union all
+
+    select 1 union all
+    select 2 union all
+    select 3 union all
+    select 4
+)
+select *
+from TestDataCte
+where
+    Value in @Values", new
+        {
+            Values = (int[])[2, 4]
+        }, ct);
+
+        var entries = new List<int>();
+        await foreach (var entry in entriesStream)
+            entries.Add(entry);
+
+        Assert.Collection(entries,
+            e => Assert.Equal(2, e),
+            e => Assert.Equal(4, e)
+        );
+    }
+
+#endif
+
+    #endregion
 }
