@@ -31,7 +31,7 @@ This means you should be able to use it almost everywhere that needs to access a
 
 ## :rocket: Features
 
-By managing database connections and transactions for you, **DapprWire** simplifies how you use **Dapper**. Here are some of the top features:
+By managing database connections and transactions for you, **DapprWire** simplifies how you use **Dapper**. Here are some of the top features that you can read in more detail on the [Wiki documentation](https://github.com/gravity00/DapprWire/wiki):
 
 ### :white_check_mark: Automatic Dependency Injection Registration
 
