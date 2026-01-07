@@ -135,6 +135,22 @@ await tx.CommitAsync(ct);
 
 Keep in mind that, when using multiple databases, **DapprWire** only manages the transaction for each session individually so you need so solve distributed transaction problems on your own.
 
+### :white_check_mark: Asynchronously Stream Large Result Sets
+
+When dealing with large result sets, loading everything into memory at once may not be the best approach.
+**DapprWire** has built-in support for `IAsyncEnumerable<T>` so you can stream and map results directly from the database without loading everything into memory first:
+
+```cs
+var productsStream = databaseSession.QueryStreamed<ProductModel>(
+  "select Id, Code, Name from Products",
+  ct
+);
+await foreach (var product in productsStream)
+{
+  // Process each product as it is received from the database
+}
+```
+
 ### :white_check_mark: Logging and Default Options
 
 **DapprWire** has native support for logging, which means that everytime you open a new database session, transaction or execute an SQL command it will be logged, if enabled.
