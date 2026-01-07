@@ -75,17 +75,19 @@ public class DatabaseGridReader(
     #endregion
 
     /// <inheritdoc />
-    public Task<IEnumerable<T>> ReadAsync<T>()
+    public async Task<IReadOnlyCollection<T>> ReadAsync<T>()
     {
         EnsureNotDisposed();
-        return _gridReader!.ReadAsync<T>();
+        var entries = await _gridReader!.ReadAsync<T>();
+        return entries.AsList();
     }
 
     /// <inheritdoc />
-    public IEnumerable<T> Read<T>()
+    public IReadOnlyCollection<T> Read<T>()
     {
         EnsureNotDisposed();
-        return _gridReader!.Read<T>();
+        var entries = _gridReader!.Read<T>();
+        return entries.AsList();
     }
 
     /// <inheritdoc />

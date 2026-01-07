@@ -269,7 +269,7 @@ public static class DatabaseSqlRunnerExtensions
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the query results.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Task<IEnumerable<T>> QueryAsync<T>(
+    public static Task<IReadOnlyCollection<T>> QueryAsync<T>(
         this IDatabaseSqlRunner databaseSqlRunner,
         string sql,
         CancellationToken ct
@@ -287,7 +287,7 @@ public static class DatabaseSqlRunnerExtensions
     /// <param name="sql">The SQL command.</param>
     /// <returns>The query results.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IEnumerable<T> Query<T>(
+    public static IReadOnlyCollection<T> Query<T>(
         this IDatabaseSqlRunner databaseSqlRunner,
         string sql
     )
@@ -306,7 +306,7 @@ public static class DatabaseSqlRunnerExtensions
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the query results.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Task<IEnumerable<T>> QueryAsync<T>(
+    public static Task<IReadOnlyCollection<T>> QueryAsync<T>(
         this IDatabaseSqlRunner databaseSqlRunner,
         string sql,
         object parameters,
@@ -329,7 +329,7 @@ public static class DatabaseSqlRunnerExtensions
     /// <param name="parameters">The SQL command parameters.</param>
     /// <returns>The query results.</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IEnumerable<T> Query<T>(
+    public static IReadOnlyCollection<T> Query<T>(
         this IDatabaseSqlRunner databaseSqlRunner,
         string sql,
         object parameters
