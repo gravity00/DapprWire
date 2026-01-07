@@ -104,7 +104,7 @@ public interface IDatabaseSqlRunner
     /// <param name="sqlOptions">The SQL options.</param>
     /// <param name="ct">The cancellation token.</param>
     /// <returns>A task to be awaited for the query results.</returns>
-    Task<IEnumerable<T>> QueryAsync<T>(
+    Task<IReadOnlyCollection<T>> QueryAsync<T>(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
@@ -117,7 +117,7 @@ public interface IDatabaseSqlRunner
     /// <param name="sql">The SQL command.</param>
     /// <param name="sqlOptions">The SQL options.</param>
     /// <returns>The query results.</returns>
-    IEnumerable<T> Query<T>(
+    IReadOnlyCollection<T> Query<T>(
         string sql,
         SqlOptions sqlOptions
     );

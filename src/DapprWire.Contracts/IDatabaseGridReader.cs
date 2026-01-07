@@ -13,14 +13,14 @@ public interface IDatabaseGridReader : IDisposable
     /// </summary>
     /// <typeparam name="T">The type to read.</typeparam>
     /// <returns>A task to be awaited for the collection of items.</returns>
-    Task<IEnumerable<T>> ReadAsync<T>();
+    Task<IReadOnlyCollection<T>> ReadAsync<T>();
 
     /// <summary>
     /// Read the next grid of results.
     /// </summary>
     /// <typeparam name="T">The type to read.</typeparam>
     /// <returns>The collection of items.</returns>
-    IEnumerable<T> Read<T>();
+    IReadOnlyCollection<T> Read<T>();
 
     /// <summary>
     /// Read the next grid of results, returning a single item.

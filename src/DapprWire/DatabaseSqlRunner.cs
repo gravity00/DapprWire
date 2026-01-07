@@ -107,7 +107,7 @@ public abstract class DatabaseSqlRunner<TName>(
     #region Query
 
     /// <inheritdoc />
-    public async Task<IEnumerable<T>> QueryAsync<T>(
+    public async Task<IReadOnlyCollection<T>> QueryAsync<T>(
         string sql,
         SqlOptions sqlOptions,
         CancellationToken ct
@@ -117,11 +117,12 @@ public abstract class DatabaseSqlRunner<TName>(
         LogCommandDefinition(command);
 
         var connection = await GetDbConnectionAsync(ct).ConfigureAwait(false);
-        return await connection.QueryAsync<T>(command).ConfigureAwait(false);
+        var entries = await connection.QueryAsync<T>(command).ConfigureAwait(false);
+        return entries.AsList();
     }
 
     /// <inheritdoc />
-    public IEnumerable<T> Query<T>(
+    public IReadOnlyCollection<T> Query<T>(
         string sql,
         SqlOptions sqlOptions
     )
@@ -130,7 +131,8 @@ public abstract class DatabaseSqlRunner<TName>(
         LogCommandDefinition(command);
 
         var connection = GetDbConnection();
-        return connection.Query<T>(command);
+        var entries = connection.Query<T>(command);
+        return entries.AsList();
     }
 
     #endregion
