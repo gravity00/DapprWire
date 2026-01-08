@@ -11,7 +11,9 @@ public sealed class DatabaseFixture : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _container = new MsSqlBuilder().Build();
+        _container = new MsSqlBuilder(
+            "mcr.microsoft.com/mssql/server:latest"
+        ).Build();
 
         await _container.StartAsync();
         
