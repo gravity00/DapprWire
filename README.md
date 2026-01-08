@@ -26,6 +26,8 @@ All packages directly target the following frameworks:
 * .NET Standard 2.0;
 * .NET Standard 2.1;
 * .NET 5.0
+* .NET 8.0
+* .NET 10.0
 
 This means you should be able to use it almost everywhere that needs to access a SQL database, from an ASP.NET Core 8 application to a Windows Service, command line terminal and even on older ASP.NET Core 2 applications.
 
