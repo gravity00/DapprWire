@@ -30,19 +30,20 @@ public static class CoreHelpers
         return new Database<TestDatabaseName>(options, () => dbConnectionFactory());
     }
 
-    public static async Task CreateTestTableRowAsync(
-        this IDatabaseSession session,
-        Guid externalId,
-        string name,
-        CancellationToken ct
-    )
+    extension(IDatabaseSession session)
     {
-        var parameters = new
+        public async Task CreateTestTableRowAsync(
+            Guid externalId,
+            string name,
+            CancellationToken ct
+        )
         {
-            ExternalId = externalId,
-            Name = name
-        };
-        await session.ExecuteAsync(@"
+            var parameters = new
+            {
+                ExternalId = externalId,
+                Name = name
+            };
+            await session.ExecuteAsync(@"
 insert into TestTable (
     ExternalId,
     Name
@@ -51,20 +52,19 @@ values (
     @ExternalId,
     @Name
 )", parameters, ct);
-    }
+        }
 
-    public static void CreateTestTableRow(
-        this IDatabaseSession session,
-        Guid externalId,
-        string name
-    )
-    {
-        var parameters = new
+        public void CreateTestTableRow(
+            Guid externalId,
+            string name
+        )
         {
-            ExternalId = externalId,
-            Name = name
-        };
-        session.Execute(@"
+            var parameters = new
+            {
+                ExternalId = externalId,
+                Name = name
+            };
+            session.Execute(@"
 insert into TestTable (
     ExternalId,
     Name
@@ -73,19 +73,18 @@ values (
     @ExternalId,
     @Name
 )", parameters);
-    }
+        }
 
-    public static async Task<TestTableEntity?> GetTestTableRowByExternalIdAsync(
-        this IDatabaseSession session,
-        Guid externalId,
-        CancellationToken ct
-    )
-    {
-        var parameters = new
+        public async Task<TestTableEntity?> GetTestTableRowByExternalIdAsync(
+            Guid externalId,
+            CancellationToken ct
+        )
         {
-            ExternalId = externalId
-        };
-        return await session.QuerySingleOrDefaultAsync<TestTableEntity>(@"
+            var parameters = new
+            {
+                ExternalId = externalId
+            };
+            return await session.QuerySingleOrDefaultAsync<TestTableEntity>(@"
 select
     Id,
     ExternalId,
@@ -93,18 +92,16 @@ select
 from TestTable
 where
     ExternalId = @ExternalId", parameters, ct);
-    }
+        }
 
-    public static TestTableEntity? GetTestTableRowByExternalId(
-        this IDatabaseSession session,
-        Guid externalId
-    )
-    {
-        var parameters = new
+        public TestTableEntity? GetTestTableRowByExternalId(Guid externalId
+        )
         {
-            ExternalId = externalId
-        };
-        return session.QuerySingleOrDefault<TestTableEntity>(@"
+            var parameters = new
+            {
+                ExternalId = externalId
+            };
+            return session.QuerySingleOrDefault<TestTableEntity>(@"
 select
     Id,
     ExternalId,
@@ -112,6 +109,7 @@ select
 from TestTable
 where
     ExternalId = @ExternalId", parameters);
+        }
     }
 
     private class TestDatabaseLogger(ITestOutputHelper output) : DatabaseLogger
