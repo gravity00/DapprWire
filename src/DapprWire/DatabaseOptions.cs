@@ -33,3 +33,9 @@ public class DatabaseOptions
     /// </summary>
     public IsolationLevel DefaultIsolationLevel { get; set; } = IsolationLevel.ReadCommitted;
 }
+
+/// <summary>
+/// Represents options for configuring the database connection, with a specific database name type.
+/// </summary>
+/// <typeparam name="TName">The database name.</typeparam>
+public class DatabaseOptions<TName> : DatabaseOptions where TName : IDatabaseName;

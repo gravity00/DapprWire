@@ -6,6 +6,25 @@ namespace DapprWire.MicrosoftExtensions;
 public class AddDatabaseTests(DatabaseFixture fixture, ITestOutputHelper output)
 {
     [Fact]
+    public void DatabaseOptions_Resolve_Singleton_Succeed()
+    {
+        using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>
+        {
+            builder.Services.AddDatabase(_ => fixture.GetDbConnection());
+        });
+
+        var databaseOptionsNamed = host.Services.GetService<DatabaseOptions<DefaultDatabaseName>>();
+
+        Assert.NotNull(databaseOptionsNamed);
+        Assert.IsType<MicrosoftExtensionsDatabaseLogger>(databaseOptionsNamed.Logger);
+
+        var databaseOptions = host.Services.GetService<DatabaseOptions>();
+        
+        Assert.NotNull(databaseOptions);
+        Assert.Same(databaseOptionsNamed, databaseOptions);
+    }
+
+    [Fact]
     public void Database_Resolve_Singleton_Succeed()
     {
         using var host = MicrosoftExtensionsHelpers.CreateTestHost(output, builder =>

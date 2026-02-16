@@ -29,16 +29,17 @@ public static class ServiceCollectionExtensions
         if (connectionFactory is null) throw new ArgumentNullException(nameof(connectionFactory));
 
         if (config is not null)
-            services.Configure(config);
+            services.Configure<DatabaseOptions<TName>>(config);
 
         services.TryAddSingleton<DatabaseLogger, MicrosoftExtensionsDatabaseLogger>();
         services.TryAddSingleton(s =>
         {
-            var options = s.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            var options = s.GetRequiredService<IOptions<DatabaseOptions<TName>>>().Value;
             if (ReferenceEquals(options.Logger, DatabaseLogger.Null))
                 options.Logger = s.GetRequiredService<DatabaseLogger>();
             return options;
         });
+        services.TryAddSingleton<DatabaseOptions>(s => s.GetRequiredService<DatabaseOptions<TName>>());
         services.TryAddTransient<DbConnectionFactory<TName>>(s => () => connectionFactory(s));
         services.TryAddSingleton<IDatabase<TName>, Database<TName>>();
         services.TryAddScoped<IDatabaseSession<TName>, DatabaseSession<TName>>();
