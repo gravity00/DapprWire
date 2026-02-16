@@ -5,17 +5,15 @@
 /// </summary>
 public class DatabaseOptions
 {
-    private DatabaseLogger _logger = DatabaseLogger.Null;
-
     /// <summary>
     /// Gets or sets the logger used for logging database operations.
     /// Defaults to <see cref="DatabaseLogger.Null"/>.
     /// </summary>
     public DatabaseLogger Logger
     {
-        get => _logger;
-        set => _logger = value.NotNull(nameof(value));
-    }
+        get;
+        set => field = value.NotNull(nameof(value));
+    } = DatabaseLogger.Null;
 
     /// <summary>
     /// Gets or sets a function that is called when a database connection is opened.

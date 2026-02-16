@@ -362,15 +362,17 @@ public abstract class DatabaseSqlRunner<TName>(
     {
         if (options.Logger.IsEnabled<DatabaseSqlRunner<TName>>(DatabaseLogLevel.Debug))
         {
-            options.Logger.LogDebug<DatabaseSqlRunner<TName>>(@"Executing SQL command
-[HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
-{CommandText}",
+            var args = new object?[]
+            {
                 command.Parameters is not null,
                 command.Transaction is not null,
                 command.CommandTimeout,
                 command.CommandType,
                 command.CommandText
-            );
+            };
+            options.Logger.LogDebug<DatabaseSqlRunner<TName>>(@"Executing SQL command
+[HasParameters:{HasParameters} IsTransactional:{IsTransactional} Timeout:{CommandTimeout} Type:{CommandType}]
+{CommandText}", args);
         }
     }
 }
