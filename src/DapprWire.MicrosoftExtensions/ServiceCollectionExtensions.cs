@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using DapprWire;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
@@ -83,62 +84,5 @@ public static class ServiceCollectionExtensions
             Func<IServiceProvider, DbConnection> connectionFactory,
             Action<DatabaseOptions>? config = null
         ) => services.AddDatabaseAsDefault<DefaultDatabaseName>(connectionFactory, config);
-
-        private void TryAddSingleton<TService, TImplementation>() where TService : class where TImplementation : class, TService
-        {
-            if (services.All(s => s.ServiceType != typeof(TService)))
-                services.AddSingleton<TService, TImplementation>();
-        }
-
-        private void TryAddSingleton<TService, TImplementation>(
-            Func<IServiceProvider, TImplementation> implementationFactory
-        ) where TService : class where TImplementation : class, TService
-        {
-            if (services.All(s => s.ServiceType != typeof(TService)))
-                services.AddSingleton<TService>(implementationFactory);
-        }
-
-        private void TryAddSingleton<TService>(
-            Func<IServiceProvider, TService> implementationFactory
-        ) where TService : class
-        {
-            services.TryAddSingleton<TService, TService>(implementationFactory);
-        }
-
-        private void TryAddScoped<TService, TImplementation>() where TService : class where TImplementation : class, TService
-        {
-            if (services.All(s => s.ServiceType != typeof(TService)))
-                services.AddScoped<TService, TImplementation>();
-        }
-
-        private void TryAddScoped<TService, TImplementation>(
-            Func<IServiceProvider, TImplementation> implementationFactory
-        ) where TService : class where TImplementation : class, TService
-        {
-            if (services.All(s => s.ServiceType != typeof(TService)))
-                services.AddScoped<TService>(implementationFactory);
-        }
-
-        private void TryAddScoped<TService>(
-            Func<IServiceProvider, TService> implementationFactory
-        ) where TService : class
-        {
-            services.TryAddScoped<TService, TService>(implementationFactory);
-        }
-
-        private void TryAddTransient<TService, TImplementation>(
-            Func<IServiceProvider, TImplementation> implementationFactory
-        ) where TService : class where TImplementation : class, TService
-        {
-            if (services.All(s => s.ServiceType != typeof(TService)))
-                services.AddTransient<TService>(implementationFactory);
-        }
-
-        private void TryAddTransient<TService>(
-            Func<IServiceProvider, TService> implementationFactory
-        ) where TService : class
-        {
-            services.TryAddTransient<TService, TService>(implementationFactory);
-        }
     }
 }
