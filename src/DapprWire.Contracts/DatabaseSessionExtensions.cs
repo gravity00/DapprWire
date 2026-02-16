@@ -14,7 +14,8 @@ public static class DatabaseSessionExtensions
         /// <param name="ct">The cancellation token.</param>
         /// <returns>A task to be awaited for the transaction to start.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public Task<IDatabaseTransaction> BeginTransactionAsync(CancellationToken ct
+        public Task<IDatabaseTransaction> BeginTransactionAsync(
+            CancellationToken ct
         )
         {
             databaseSession.EnsureNotNull();
