@@ -1,10 +1,10 @@
-# :pushpin: DapprWire - Dapper + Microsoft DI made easy
+# DapprWire - Dapper + Microsoft DI made easy
 
 **DapprWire** simplifies the integration of **Dapper** into **Microsoft's Dependency Injection (DI) container**, making database connectivity effortless and efficient. It provides an abstraction layer for **connection and transaction management**, that can be easily injected into your services or repositories, while exposing all Dapper operations so you can use it as your micro-ORM the same way you use **Dapper**.
 
 If you're tired of manually wiring `IDbConnection` into Microsoft DI, reminding yourself to pass `IDbTransaction` as an argument, or simply have some logs to help analyzing production problems, **DapprWire** provides a clean and simple solution for that.
 
-## :briefcase: Packages
+## Packages
 
 | Package | NuGet | Downloads |
 | ------- | ----- | --------- |
@@ -31,11 +31,11 @@ All packages directly target the following frameworks:
 
 This means you should be able to use it almost everywhere that needs to access a SQL database, from an ASP.NET Core 8 application to a Windows Service, command line terminal and even on older ASP.NET Core 2 applications.
 
-## :rocket: Features
+## Features
 
 By managing database connections and transactions for you, **DapprWire** simplifies how you use **Dapper**. Here are some of the top features that you can read in more detail on the [Wiki documentation](https://github.com/gravity00/DapprWire/wiki):
 
-### :white_check_mark: Automatic Dependency Injection Registration
+### Automatic Dependency Injection Registration
 
 If your application uses `Microsoft.Extensions.DependencyInjection`, simply install the `DapprWire.MicrosoftExtensions` package:
 
@@ -68,7 +68,7 @@ public class ProductsController(IDatabaseSession databaseSession) : ControllerBa
 }
 ```
 
-### :white_check_mark: Multiple Database Support
+### Multiple Database Support
 
 If your application needs to connect to multiple databases, like a service that synchronizes data between multiple systems, you can easily define multiple `IDatabaseName`, one for each database you need to connect.
 
@@ -106,7 +106,7 @@ public class ProductsController(
 }
 ```
 
-### :white_check_mark: Database Transactions
+### Database Transactions
 
 When you need to manage database transactions, after starting a new transaction **DapprWire** will automatically pass it to **Dapper** when executing any database operation until it is disposed, preventing transactional problems:
 
@@ -137,7 +137,7 @@ await tx.CommitAsync(ct);
 
 Keep in mind that, when using multiple databases, **DapprWire** only manages the transaction for each session individually so you need so solve distributed transaction problems on your own.
 
-### :white_check_mark: Asynchronously Stream Large Result Sets
+### Asynchronously Stream Large Result Sets
 
 When dealing with large result sets, loading everything into memory at once may not be the best approach.
 **DapprWire** has built-in support for `IAsyncEnumerable<T>` so you can stream and map results directly from the database without loading everything into memory first:
@@ -153,7 +153,7 @@ await foreach (var product in productsStream)
 }
 ```
 
-### :white_check_mark: Logging and Default Options
+### Logging and Default Options
 
 **DapprWire** has native support for logging, which means that everytime you open a new database session, transaction or execute an SQL command it will be logged, if enabled.
 By default, logging is disabled except when using the `DapprWire.MicrosoftExtensions` package since it will use Microsoft `ILogger` façade so you can manage logging configurations via application settings.
@@ -189,7 +189,7 @@ builder.Services.AddDatabase(_ => new SqlConnection(connectionString), options =
 });
 ```
 
-## :hammer: Build
+## Build
 
 You should be able to easily build this solution as long you have installed both SDKs for .NET 8.0 and .NET Framework 4.8, but more recent versions should also work.
 
@@ -199,7 +199,7 @@ cd .\DapprWire
 dotnet build
 ```
 
-## :construction: Test
+## Test
 
 This library is focused on interacting with SQL databases and unit tests currently require a running SQL Server instance.
 To make the setup easier, the library [Testcontainers](https://testcontainers.com/) is used so you only need Docker running on your local machine and everything should run as expected.
